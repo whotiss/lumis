@@ -1,0 +1,29 @@
+# Secrets
+.env
+*.env
+
+# Data and models (these live in Google Drive, never in git)
+data/
+datasets/
+checkpoints/
+saved_model/
+*.zip
+*.h5
+*.keras
+*.tflite
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Flutter (flutter create adds its own too)
+app/build/
+app/.dart_tool/
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.vscode/
