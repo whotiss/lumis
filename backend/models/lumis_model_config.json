@@ -1,0 +1,59 @@
+{
+ "model_version": "lumis-effb0-v1",
+ "model_file": "lumis_effb0_v1.onnx",
+ "onnx_sha256": "74e8a43b21bd072eb9990eef8bb15f10fa59bfb97f726a5a35434e8ec34f142f",
+ "run": "efficientnetb0_20261109_1427",
+ "backbone": "efficientnetb0",
+ "split": "v2",
+ "classes": [
+  "acne",
+  "eczema",
+  "psoriasis",
+  "scabies",
+  "tinea"
+ ],
+ "img_size": 224,
+ "input": "float32 (batch, 224, 224, 3), RGB 0-255; resized like tf.image.resize (bilinear, no aspect ratio)",
+ "temperature": 1.3044,
+ "prior_tau": 0.75,
+ "class_prior": {
+  "acne": 0.1315,
+  "eczema": 0.3087,
+  "psoriasis": 0.2581,
+  "scabies": 0.0758,
+  "tinea": 0.2259
+ },
+ "logit_adjust": [
+  -0.22778,
+  0.41253,
+  0.27813,
+  -0.64123,
+  0.17835
+ ],
+ "bands": {
+  "high_from": 0.74,
+  "refer_below": 0.52
+ },
+ "cap_at_moderate": [
+  "scabies"
+ ],
+ "test_results": {
+  "n": 972,
+  "evaluated_at": "2026-11-10 19:31",
+  "accuracy": 0.6553,
+  "accuracy_ci95": [
+   0.6255,
+   0.6842
+  ],
+  "macro_sensitivity": 0.6615,
+  "macro_specificity": 0.9101,
+  "referred": 0.3117,
+  "accuracy_when_answering": 0.7608
+ },
+ "exported_at": "2026-11-10 20:06",
+ "exported_with": {
+  "tensorflow": "2.21.0",
+  "keras": "3.13.2",
+  "tf2onnx": "1.17.0"
+ }
+}

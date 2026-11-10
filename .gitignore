@@ -11,6 +11,7 @@ saved_model/
 *.h5
 *.keras
 *.tflite
+*.onnx
 
 # Python
 __pycache__/

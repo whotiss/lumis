@@ -1,0 +1,8 @@
+# Model inference (no TensorFlow needed at runtime)
+onnxruntime>=1.18
+numpy>=1.26
+pillow>=10.3
+simplejpeg>=1.7
+
+# Tests
+pytest>=8
