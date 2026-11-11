@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 from PIL import Image, ImageOps
 
-from app.ml.predictor import (ModelConfig, UnsupportedImageError, LumisPredictor, decode_image,
-                              postprocess, preprocess, resize_like_tf)
+from app.ml.predictor import (ModelConfig, PhotoCheckConfig, UnsupportedImageError, LumisPredictor, decode_image,
+                              energy_score, postprocess, preprocess, resize_like_tf, skin_fraction)
 
 MODELS = Path(__file__).resolve().parents[1] / "models"
 
@@ -78,6 +78,33 @@ def test_matches_tensorflow_pipeline_if_installed():
         ours = preprocess(data)[0]
         assert np.abs(ours - ref).max() <= 1, fmt                 # float rounding only
         assert (ours != ref).mean() < 0.001, fmt
+
+
+# ---------------------------------------------------------------- photo check
+
+def test_skin_fraction():
+    skin_tones = [(224, 172, 140), (198, 134, 96), (141, 85, 54), (88, 52, 36)]     # light to dark
+    for rgb in skin_tones:
+        assert skin_fraction(np.full((200, 200, 3), rgb, np.uint8)) > 0.9, rgb
+    for rgb in [(30, 80, 200), (40, 160, 60), (128, 128, 128), (250, 250, 250)]:     # blue, green, gray, white
+        assert skin_fraction(np.full((200, 200, 3), rgb, np.uint8)) < 0.1, rgb
+
+
+def test_skin_fraction_accepts_rotated_arrays():
+    img = np.asarray(make_image(64, 48))
+    assert skin_fraction(np.rot90(img)) == pytest.approx(skin_fraction(img), abs=0.02)
+
+
+def test_energy_score_is_lower_for_confident_logits():
+    assert energy_score(np.array([8.0, 0, 0, 0, 0])) < energy_score(np.array([0.5, 0.4, 0.3, 0.2, 0.1]))
+    assert energy_score(np.zeros(5)) == pytest.approx(-np.log(5))
+
+
+def test_photo_check_order():
+    check = PhotoCheckConfig(min_skin_fraction=0.2, max_energy=-3.0)
+    assert check.status(0.1, -10) == "no_skin"              # skin is checked first
+    assert check.status(0.5, -1.0) == "nothing_detected"
+    assert check.status(0.5, -5.0) == "ok"
 
 
 # ---------------------------------------------------------------- output -> result

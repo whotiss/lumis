@@ -13,6 +13,11 @@ Preprocessing reproduces training exactly (ml/03_train.ipynb), checked pixel for
 One deliberate difference from training: phone photos are turned upright using their EXIF
 orientation tag, because phones often save the pixels sideways.
 
+Photo check (notebook 10), before any result is shown:
+  no_skin           too few skin-colored pixels (the notebook 06 rule: YCbCr Cr 130-190, Cb 70-130)
+  nothing_detected  the photo is unlike any of the training photos (energy score above the threshold)
+Thresholds live in models/photo_check.json. Without that file every photo passes.
+
 Output steps, decided in notebooks 04, 04b and 08:
   adjusted logits = logits + logit_adjust     (prior adjustment, training mix, tau 0.75)
   probabilities   = softmax(adjusted logits / temperature)
@@ -24,7 +29,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 
 import numpy as np
@@ -107,11 +112,52 @@ def resize_like_tf(img: np.ndarray, size: int) -> np.ndarray:
     return top * (1 - fy3) + bottom * fy3
 
 
-def preprocess(data: bytes, size: int = 224, apply_exif: bool = True) -> np.ndarray:
-    """Image file bytes -> float32 model input of shape (1, size, size, 3), values 0-255."""
-    rgb = decode_image(data, apply_exif=apply_exif)
+def to_model_input(rgb: np.ndarray, size: int = 224) -> np.ndarray:
+    """Decoded RGB array -> float32 model input of shape (1, size, size, 3), values 0-255."""
     resized = resize_like_tf(rgb, size).astype(np.uint8)       # truncation, as in training
     return resized.astype(np.float32)[None]
+
+
+def preprocess(data: bytes, size: int = 224, apply_exif: bool = True) -> np.ndarray:
+    """Image file bytes -> float32 model input of shape (1, size, size, 3), values 0-255."""
+    return to_model_input(decode_image(data, apply_exif=apply_exif), size)
+
+
+# ---------------------------------------------------------------- photo check
+
+def skin_fraction(rgb: np.ndarray) -> float:
+    """Share of skin-colored pixels, the rule from notebook 06: on a 128 x 128 copy, YCbCr chroma
+    Cr 130-190 and Cb 70-130. Deliberately wide so red rashes and darker skin count as skin."""
+    small = Image.fromarray(np.ascontiguousarray(rgb)).resize((128, 128)).convert("YCbCr")
+    ycc = np.asarray(small, dtype=np.int16)
+    cb, cr = ycc[..., 1], ycc[..., 2]
+    return float(((cr >= 130) & (cr <= 190) & (cb >= 70) & (cb <= 130)).mean())
+
+
+def energy_score(logits: np.ndarray) -> float:
+    """Energy of the raw logits, -logsumexp (Liu et al., 2020). Photos like the training photos get low
+    (more negative) energy; photos unlike anything the model was trained on get higher energy."""
+    z = np.asarray(logits, dtype=np.float64).reshape(-1)
+    m = z.max()
+    return float(-(m + np.log(np.exp(z - m).sum())))
+
+
+@dataclass(frozen=True)
+class PhotoCheckConfig:
+    min_skin_fraction: float
+    max_energy: float
+
+    @classmethod
+    def load(cls, path: str | Path) -> "PhotoCheckConfig":
+        c = json.loads(Path(path).read_text())
+        return cls(min_skin_fraction=float(c["min_skin_fraction"]), max_energy=float(c["max_energy"]))
+
+    def status(self, skin: float, energy: float) -> str:
+        if skin < self.min_skin_fraction:
+            return "no_skin"
+        if energy > self.max_energy:
+            return "nothing_detected"
+        return "ok"
 
 
 # ---------------------------------------------------------------- model output -> result
@@ -147,6 +193,9 @@ class Prediction:
     probabilities: dict[str, float]
     capped: bool                # True if the scabies rule lowered the band from high to moderate
     model_version: str
+    status: str = "ok"          # 'ok' | 'no_skin' | 'nothing_detected' (photo check)
+    skin_fraction: float | None = None
+    energy: float | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -192,10 +241,12 @@ def sha256_of(path: str | Path) -> str:
 class LumisPredictor:
     """Load once at startup, then call predict() per upload. Safe to share across requests."""
 
-    def __init__(self, model_path: str | Path, config_path: str | Path, verify_checksum: bool = True):
+    def __init__(self, model_path: str | Path, config_path: str | Path, verify_checksum: bool = True,
+                 photo_check_path: str | Path | None = None):
         import onnxruntime as ort
 
         self.config = ModelConfig.load(config_path)
+        self.photo_check = PhotoCheckConfig.load(photo_check_path) if photo_check_path else None
         if verify_checksum and self.config.onnx_sha256:
             actual = sha256_of(model_path)
             if actual != self.config.onnx_sha256:
@@ -209,11 +260,18 @@ class LumisPredictor:
         """Load the config in models_dir and the ONNX file it names."""
         models_dir = Path(models_dir)
         config_path = models_dir / config_name
-        return cls(models_dir / ModelConfig.load(config_path).model_file, config_path)
+        photo_check = models_dir / "photo_check.json"
+        return cls(models_dir / ModelConfig.load(config_path).model_file, config_path,
+                   photo_check_path=photo_check if photo_check.exists() else None)
 
     def logits(self, batch: np.ndarray) -> np.ndarray:
         return self.session.run(None, {self.input_name: batch.astype(np.float32)})[0]
 
     def predict(self, data: bytes) -> Prediction:
-        x = preprocess(data, self.config.img_size)
-        return postprocess(self.logits(x)[0], self.config)
+        rgb = decode_image(data)
+        skin = skin_fraction(rgb)
+        logits = self.logits(to_model_input(rgb, self.config.img_size))[0]
+        energy = energy_score(logits)
+        status = self.photo_check.status(skin, energy) if self.photo_check else "ok"
+        return replace(postprocess(logits, self.config), status=status,
+                       skin_fraction=round(skin, 4), energy=round(energy, 4))

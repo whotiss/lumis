@@ -46,3 +46,20 @@ def result_text(band: str, condition_name: str, urgency: str) -> ResultText:
     see_doctor = band == "moderate" or urgency == "see_doctor"
     return ResultText(show_condition=True, headline=headline, advice=advice,
                       recommended_action="see_doctor" if see_doctor else "monitor", show_clinics=see_doctor)
+
+
+# Photo check (notebook 10): shown instead of a result. "Nothing detected" must never sound like
+# "your skin is healthy", because Lumis only screens for five conditions (NFR8).
+PHOTO_CHECK_TEXT = {
+    "no_skin": {
+        "headline": "No skin detected.",
+        "advice": "Lumis couldn't find skin in this photo. Take a close-up photo of the skin you are "
+                  "concerned about, in good light, filling most of the frame.",
+    },
+    "nothing_detected": {
+        "headline": "Nothing detected.",
+        "advice": "Lumis couldn't find any of the skin conditions it screens for in this photo. "
+                  "This does not mean your skin is healthy: Lumis only checks for five conditions. "
+                  "If you are concerned, retake the photo close up in good light, or see a doctor.",
+    },
+}

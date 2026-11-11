@@ -9,7 +9,7 @@ from ..ml.predictor import UnsupportedImageError
 from ..models import Condition, Screening, User, as_utc
 from ..schemas import ConditionRef, ScreeningOut, SymptomDetails
 from ..storage import LocalImageStorage
-from ..wording import BAND_LABELS, DISCLAIMER, result_text
+from ..wording import BAND_LABELS, DISCLAIMER, PHOTO_CHECK_TEXT, result_text
 
 router = APIRouter(prefix="/screenings", tags=["screenings"])
 
@@ -33,7 +33,9 @@ def _own_screening(screening_id: int, user: User, db: Session) -> Screening:
     return s
 
 
-@router.post("", response_model=ScreeningOut, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ScreeningOut, status_code=status.HTTP_201_CREATED,
+             responses={422: {"description": "Photo check failed: detail.code is 'no_skin' or 'nothing_detected', "
+                                             "with headline and advice to show"}})
 def create_screening(
     image: UploadFile = File(..., description="JPEG, PNG or WebP photo of the skin"),
     duration: str | None = Form(None, description="under_1_week | 1_to_4_weeks | over_1_month"),
@@ -56,6 +58,10 @@ def create_screening(
         prediction = predictor.predict(data)
     except UnsupportedImageError as exc:
         raise HTTPException(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, str(exc))
+    if prediction.status != "ok":
+        # Photo check failed: nothing is saved, and the app shows this message instead of a result
+        raise HTTPException(422, {"code": prediction.status, **PHOTO_CHECK_TEXT[prediction.status],
+                                  "disclaimer": DISCLAIMER})
 
     condition = db.get(Condition, prediction.condition)
     if condition is None:

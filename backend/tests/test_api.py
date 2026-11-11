@@ -1,5 +1,6 @@
 """API tests. A fake model gives chosen outputs so every band and rule can be tested;
 the last test runs the real model when backend/models/ has it."""
+import dataclasses
 import io
 from pathlib import Path
 
@@ -24,10 +25,11 @@ class FakePredictor:
                                   logit_adjust=[0.0] * 5, high_from=0.74, refer_below=0.52,
                                   cap_at_moderate=["scabies"])
         self.logits = np.array([5.0, 0, 0, 0, 0])
+        self.status = "ok"
 
     def predict(self, data):
         preprocess(data, 224)
-        return postprocess(self.logits, self.config)
+        return dataclasses.replace(postprocess(self.logits, self.config), status=self.status)
 
 
 def photo(fmt="JPEG"):
@@ -152,6 +154,28 @@ def test_no_diagnostic_wording_anywhere(env):
         assert "you have" not in text and "diagnosed" not in text and "diagnosis" not in text
 
 
+# ---------------------------------------------------------------- photo check
+
+@pytest.mark.parametrize("code, headline", [("no_skin", "No skin detected."), ("nothing_detected", "Nothing detected.")])
+def test_photo_check_rejections(env, code, headline):
+    client, fake, img_dir = env
+    fake.status = code
+    h = signup(client)
+    r = screen(client, h)
+    assert r.status_code == 422
+    detail = r.json()["detail"]
+    assert detail["code"] == code and detail["headline"] == headline and detail["disclaimer"] == DISCLAIMER
+    assert client.get("/screenings", headers=h).json() == []        # nothing saved
+    assert list(img_dir.rglob("*.jpg")) == []                         # photo not kept
+
+
+def test_nothing_detected_never_says_healthy(env):
+    client, fake, _ = env
+    fake.status = "nothing_detected"
+    advice = screen(client, signup(client)).json()["detail"]["advice"].lower()
+    assert "does not mean your skin is healthy" in advice
+
+
 # ---------------------------------------------------------------- uploads
 
 def test_bad_uploads(env):
@@ -237,3 +261,8 @@ def test_real_model_end_to_end(tmp_path):
         assert body["band"] in {"high", "moderate", "refer"}
         assert body["model_version"] == "lumis-effb0-v1"
         assert client.get("/model").json()["test_results"]["accuracy"] == pytest.approx(0.6553, abs=1e-3)
+        if (MODELS / "photo_check.json").exists():                    # a plain blue picture is not skin
+            b = io.BytesIO()
+            Image.new("RGB", (400, 300), (30, 80, 200)).save(b, "JPEG")
+            r = screen(client, signup(client, "blue@example.com"), data=b.getvalue())
+            assert r.status_code == 422 and r.json()["detail"]["code"] == "no_skin"

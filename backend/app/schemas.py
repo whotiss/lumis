@@ -2,10 +2,14 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class RegisterIn(BaseModel):
+    # Example shown on the /docs page, so "Try it out" then "Execute" works as it is
+    model_config = ConfigDict(json_schema_extra={"example": {
+        "email": "demo@lumis.app", "password": "lumis-demo-123", "consent_storage": True}})
+
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
     consent_storage: bool = False
