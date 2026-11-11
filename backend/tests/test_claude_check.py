@@ -49,6 +49,7 @@ def test_request_shape_and_candidate_order_hides_the_model_pick():
     text = r1["messages"][0]["content"][1]["text"]
     assert text.index("A) Eczema") < text.index("B) Fungal")
     assert r1["extra_body"]["output_config"]["format"]["schema"] == SCHEMA
+    assert r1["thinking"] == {"type": "disabled"} and r1["max_tokens"] >= 1024
     assert r1["messages"][0]["content"][0]["source"]["media_type"] == "image/jpeg"
 
 
@@ -57,6 +58,8 @@ def test_parse_maps_letters_back_to_conditions():
     assert v.ok and v.choice == "tinea"                              # B = second alphabetically
     assert parse_response(fake_response(answer("neither")), ["tinea", "eczema"], "m").choice == "neither"
     assert not parse_response(fake_response("not json"), ["a", "b"], "m").ok
+    cut = parse_response(fake_response('{"skin_vis', "max_tokens"), ["a", "b"], "m")
+    assert not cut.ok and "max_tokens" in cut.error
     assert parse_response(fake_response(answer(), "refusal"), ["a", "b"], "m").error == "refusal"
 
 

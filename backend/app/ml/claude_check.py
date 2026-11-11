@@ -85,7 +85,8 @@ def build_request(jpeg: bytes, candidates: list[str], names: dict[str, str], mod
     a, b = sorted(candidates)
     return {
         "model": model,
-        "max_tokens": 200,
+        "max_tokens": 1024,            # thinking tokens would count toward this limit, so keep headroom
+        "thinking": {"type": "disabled"},   # Haiku 5.5 thinks by default; off keeps the check fast (NFR1)
         "system": SYSTEM,
         "messages": [{"role": "user", "content": [
             {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg",
@@ -109,7 +110,8 @@ def parse_response(response, candidates: list[str], model: str) -> ClaudeVerdict
                              photo_quality=str(d["photo_quality"]).lower(),
                              photo_problem=str(d["photo_problem"]).lower(), choice=choice, model=model)
     except (TypeError, ValueError, KeyError) as exc:
-        return ClaudeVerdict(ok=False, error=f"unreadable output: {type(exc).__name__}", model=model)
+        stop = getattr(response, "stop_reason", None)
+        return ClaudeVerdict(ok=False, error=f"unreadable output ({stop}): {type(exc).__name__}", model=model)
 
 
 class ClaudeChecker:
