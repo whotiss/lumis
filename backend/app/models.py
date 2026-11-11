@@ -60,6 +60,8 @@ class Screening(Base):
     recommended_action: Mapped[str] = mapped_column(String(20))        # see_doctor / monitor
     probabilities: Mapped[dict] = mapped_column(JSON)
     model_version: Mapped[str] = mapped_column(String(50))
+    model_band: Mapped[str | None] = mapped_column(String(10))           # band before the Claude check
+    claude_check: Mapped[dict | None] = mapped_column(JSON)               # Claude's structured answer, or None
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True)
 
     user: Mapped[User] = relationship(back_populates="screenings")

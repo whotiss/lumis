@@ -26,7 +26,8 @@ def model_info(request: Request):
         test_results = json.loads(config_path.read_text()).get("test_results")
     return ModelInfoOut(model_version=cfg.model_version, classes=cfg.classes,
                         bands={"high_from": cfg.high_from, "refer_below": cfg.refer_below,
-                               "never_high": cfg.cap_at_moderate},
+                               "never_high": cfg.cap_at_moderate,
+                               "claude_check": request.app.state.claude_checker is not None},
                         test_results=test_results)
 
 

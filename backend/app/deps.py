@@ -26,6 +26,10 @@ def get_predictor(request: Request):
     return request.app.state.predictor
 
 
+def get_claude_checker(request: Request):
+    return getattr(request.app.state, "claude_checker", None)
+
+
 def get_storage(request: Request) -> LocalImageStorage:
     return request.app.state.storage
 

@@ -13,6 +13,9 @@ psycopg[binary]>=3.1
 pwdlib[argon2]>=0.2
 pyjwt>=2.8
 
+# Claude check (optional, needs ANTHROPIC_API_KEY)
+anthropic>=0.40
+
 # Model inference (no TensorFlow needed at runtime)
 onnxruntime>=1.18
 numpy>=1.26

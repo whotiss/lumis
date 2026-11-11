@@ -4,8 +4,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..config import Settings
-from ..deps import current_user, get_db, get_predictor, get_settings, get_storage
-from ..ml.predictor import UnsupportedImageError
+from ..deps import current_user, get_claude_checker, get_db, get_predictor, get_settings, get_storage
+from ..ml.claude_check import apply_verdict
+from ..ml.predictor import UnsupportedImageError, decode_image
 from ..models import Condition, Screening, User, as_utc
 from ..schemas import ConditionRef, ScreeningOut, SymptomDetails
 from ..storage import LocalImageStorage
@@ -34,7 +35,7 @@ def _own_screening(screening_id: int, user: User, db: Session) -> Screening:
 
 
 @router.post("", response_model=ScreeningOut, status_code=status.HTTP_201_CREATED,
-             responses={422: {"description": "Photo check failed: detail.code is 'no_skin' or 'nothing_detected', "
+             responses={422: {"description": "Photo check failed: detail.code is 'no_skin', 'poor_photo' or 'nothing_detected', "
                                              "with headline and advice to show"}})
 def create_screening(
     image: UploadFile = File(..., description="JPEG, PNG or WebP photo of the skin"),
@@ -43,6 +44,7 @@ def create_screening(
     changing: bool | None = Form(None),
     user: User = Depends(current_user), db: Session = Depends(get_db), predictor=Depends(get_predictor),
     storage: LocalImageStorage = Depends(get_storage), settings: Settings = Depends(get_settings),
+    claude=Depends(get_claude_checker),
 ):
     data = image.file.read(settings.max_upload_bytes + 1)
     if not data:
@@ -66,13 +68,25 @@ def create_screening(
     condition = db.get(Condition, prediction.condition)
     if condition is None:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Condition reference data is missing.")
-    text = result_text(prediction.band, condition.name, condition.urgency_default)
+
+    # Claude check (only if switched on): can only lower the band or ask for a better photo
+    band, verdict = prediction.band, None
+    if claude is not None:
+        top2 = sorted(prediction.probabilities, key=prediction.probabilities.get, reverse=True)[:2]
+        names = {c.id: c.name for c in db.scalars(select(Condition).where(Condition.id.in_(top2)))}
+        verdict = claude.check(decode_image(data), top2, names)
+        check_status, band = apply_verdict(prediction.band, prediction.condition, verdict)
+        if check_status != "ok":
+            raise HTTPException(422, {"code": check_status, **PHOTO_CHECK_TEXT[check_status], "disclaimer": DISCLAIMER})
+
+    text = result_text(band, condition.name, condition.urgency_default)
     reference = storage.save(user.id, data) if user.consent_storage else None
     s = Screening(user_id=user.id, image_reference=reference,
                   symptom_details=details.model_dump(exclude_none=True) or None,
                   predicted_condition_id=condition.id, confidence_value=prediction.confidence,
-                  band=prediction.band, capped=prediction.capped, recommended_action=text.recommended_action,
-                  probabilities=prediction.probabilities, model_version=prediction.model_version)
+                  band=band, capped=prediction.capped, recommended_action=text.recommended_action,
+                  probabilities=prediction.probabilities, model_version=prediction.model_version,
+                  model_band=prediction.band, claude_check=verdict.to_dict() if verdict else None)
     db.add(s)
     try:
         db.commit()

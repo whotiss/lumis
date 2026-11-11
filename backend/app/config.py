@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     model_dir: Path = BACKEND_DIR / "models"
     image_dir: Path = BACKEND_DIR / "uploads"         # local image store for development
     max_upload_mb: int = 10
+    anthropic_api_key: str | None = None             # ANTHROPIC_API_KEY; the Claude check runs only if set
 
     @property
     def max_upload_bytes(self) -> int:

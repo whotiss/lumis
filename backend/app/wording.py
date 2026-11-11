@@ -56,6 +56,11 @@ PHOTO_CHECK_TEXT = {
         "advice": "Lumis couldn't find skin in this photo. Take a close-up photo of the skin you are "
                   "concerned about, in good light, filling most of the frame.",
     },
+    "poor_photo": {
+        "headline": "Photo not clear enough.",
+        "advice": "Lumis couldn't see the skin clearly enough to check it. Retake the photo close up, "
+                  "in focus and in good light, with the area filling most of the frame.",
+    },
     "nothing_detected": {
         "headline": "Nothing detected.",
         "advice": "Lumis couldn't find any of the skin conditions it screens for in this photo. "
