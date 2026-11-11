@@ -75,7 +75,8 @@ def create_screening(
         top2 = sorted(prediction.probabilities, key=prediction.probabilities.get, reverse=True)[:2]
         names = {c.id: c.name for c in db.scalars(select(Condition).where(Condition.id.in_(top2)))}
         verdict = claude.check(decode_image(data), top2, names)
-        check_status, band = apply_verdict(prediction.band, prediction.condition, verdict)
+        check_status, band = apply_verdict(prediction.band, prediction.condition, verdict,
+                                          skin_gate=claude.skin_gate, full=claude.full)
         if check_status != "ok":
             raise HTTPException(422, {"code": check_status, **PHOTO_CHECK_TEXT[check_status], "disclaimer": DISCLAIMER})
 

@@ -1,0 +1,69 @@
+{
+ "min_skin_fraction": 0.0219,
+ "max_energy": -1.067,
+ "pass_target": 0.99,
+ "model_version": "lumis-effb0-v1",
+ "set_on": "validation condition photos",
+ "measured": {
+  "Validation: condition photos": {
+   "n": 974,
+   "passes": 0.9795,
+   "no_skin": 0.0103,
+   "nothing_detected": 0.0103
+  },
+  "DermNet non-skin (microscopy, insects)": {
+   "n": 170,
+   "passes": 0.6471,
+   "no_skin": 0.2882,
+   "nothing_detected": 0.0647
+  },
+  "Test: condition photos, skin type I-II": {
+   "n": 857,
+   "passes": 0.9778,
+   "no_skin": 0.0117,
+   "nothing_detected": 0.0105
+  },
+  "Test: condition photos, skin type III-IV": {
+   "n": 84,
+   "passes": 0.9643,
+   "no_skin": 0.0119,
+   "nothing_detected": 0.0238
+  },
+  "Test: condition photos, skin type V-VI": {
+   "n": 17,
+   "passes": 1.0,
+   "no_skin": 0.0,
+   "nothing_detected": 0.0
+  },
+  "Your photos: healthy skin": {
+   "n": 3,
+   "passes": 0.6667,
+   "no_skin": 0.0,
+   "nothing_detected": 0.3333
+  },
+  "Your photos: not skin": {
+   "n": 20,
+   "passes": 0.8,
+   "no_skin": 0.15,
+   "nothing_detected": 0.05
+  },
+  "Your photos: real conditions (should pass)": {
+   "n": 1,
+   "passes": 1.0,
+   "no_skin": 0.0,
+   "nothing_detected": 0.0
+  },
+  "SCIN phone photos, 5 conditions (should pass)": {
+   "n": 517,
+   "passes": 0.9516,
+   "no_skin": 0.0,
+   "nothing_detected": 0.0484
+  }
+ },
+ "test_pass_rate_by_skin_type": {
+  "I-II": 0.9778,
+  "III-IV": 0.9643,
+  "V-VI": 1.0
+ },
+ "created_at": "2026-11-11 18:11"
+}

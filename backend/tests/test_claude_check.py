@@ -71,6 +71,19 @@ def test_rule_only_lowers():
     assert apply_verdict("high", "eczema", ok("eczema", skin=False)) == ("no_skin", "high")
     assert apply_verdict("high", "eczema", ok("eczema", q="poor")) == ("poor_photo", "high")
     assert apply_verdict("high", "eczema", ClaudeVerdict(ok=False, error="x")) == ("ok", "high")
+    # skin gate only: rejects non-skin, never changes a band or asks for a retake
+    assert apply_verdict("high", "eczema", ok("tinea"), full=False) == ("ok", "high")
+    assert apply_verdict("high", "eczema", ok("eczema", q="poor"), full=False) == ("ok", "high")
+    assert apply_verdict("high", "eczema", ok("eczema", skin=False), full=False) == ("no_skin", "high")
+
+
+def test_config_parts(tmp_path):
+    from app.ml.claude_check import ClaudeCheckConfig
+    assert not ClaudeCheckConfig.load(tmp_path / "missing.json").any
+    p = tmp_path / "c.json"
+    p.write_text(json.dumps({"enabled": False, "skin_gate": True}))
+    c = ClaudeCheckConfig.load(p)
+    assert c.any and c.skin_gate and not c.enabled
 
 
 def test_api_failure_skips_check():
@@ -134,3 +147,18 @@ def test_no_checker_means_no_calls(make_env):
     with client:
         assert screen(client, signup(client)).status_code == 201
         assert client.get("/model").json()["bands"]["claude_check"] is False
+
+
+def test_skin_gate_only_mode(tmp_path):
+    settings = Settings(database_url=f"sqlite:///{(tmp_path / 'g.db').as_posix()}", image_dir=tmp_path / "img",
+                        jwt_secret="test-secret-at-least-32-characters-long")
+    fake = FakePredictor()
+    fake.logits = np.array([0, 5.0, 0, 0, 3.0])
+    gate = ClaudeChecker("k", client=FakeClient(answer("B")), full=False)          # disagrees, but gate-only
+    with TestClient(create_app(settings, predictor=fake, claude_checker=gate)) as client:
+        assert screen(client, signup(client)).json()["band"] == "high"
+        assert client.get("/model").json()["bands"]["claude_full_check"] is False
+    gate = ClaudeChecker("k", client=FakeClient(answer(skin=False)), full=False)
+    with TestClient(create_app(settings, predictor=fake, claude_checker=gate)) as client:
+        r = screen(client, signup(client, "b@lumis.app"))
+        assert r.status_code == 422 and r.json()["detail"]["code"] == "no_skin"

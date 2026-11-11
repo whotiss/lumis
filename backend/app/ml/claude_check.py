@@ -14,7 +14,9 @@ Rule (decided 2026-11-11, before any evaluation): Claude can only make Lumis MOR
 Claude's answer is never shown to the user. The two candidates are given in alphabetical order, so their
 order does not hint which one the model preferred.
 
-Used only if notebook 15 shows it helps on SCIN validation photos (models/claude_check.json, "enabled": true).
+Two parts, each switched on separately by notebook 15 on its own pre-declared rule (models/claude_check.json):
+  "skin_gate": true  -> only question 1 is used (no skin -> "No skin detected"); bands are never changed.
+  "enabled": true    -> all three questions are used, as described above.
 """
 from __future__ import annotations
 
@@ -111,11 +113,13 @@ def parse_response(response, candidates: list[str], model: str) -> ClaudeVerdict
 
 
 class ClaudeChecker:
-    def __init__(self, api_key: str, model: str = DEFAULT_MODEL, timeout: float = 20.0, client=None):
+    def __init__(self, api_key: str, model: str = DEFAULT_MODEL, timeout: float = 20.0, client=None,
+                 skin_gate: bool = True, full: bool = True):
         if client is None:
             import anthropic
             client = anthropic.Anthropic(api_key=api_key, timeout=timeout, max_retries=1)
         self.client, self.model = client, model
+        self.skin_gate, self.full = skin_gate, full          # which parts of the rule are switched on
 
     def check(self, rgb: np.ndarray, candidates: list[str], names: dict[str, str]) -> ClaudeVerdict:
         try:
@@ -128,13 +132,16 @@ class ClaudeChecker:
 LOWER = {"high": "moderate", "moderate": "refer", "refer": "refer"}
 
 
-def apply_verdict(band: str, top: str, verdict: ClaudeVerdict) -> tuple[str, str]:
+def apply_verdict(band: str, top: str, verdict: ClaudeVerdict, skin_gate: bool = True,
+                  full: bool = True) -> tuple[str, str]:
     """(model band, model top condition, verdict) -> (status, band). Status is 'ok', 'no_skin' or 'poor_photo'.
-    Never raises a band."""
+    Never raises a band. skin_gate / full say which parts of the rule are switched on."""
     if not verdict.ok:
         return "ok", band
-    if verdict.skin_visible is False:
+    if (skin_gate or full) and verdict.skin_visible is False:
         return "no_skin", band
+    if not full:
+        return "ok", band
     if verdict.photo_quality == "poor":
         return "poor_photo", band
     if verdict.choice == top:
@@ -144,8 +151,13 @@ def apply_verdict(band: str, top: str, verdict: ClaudeVerdict) -> tuple[str, str
 
 @dataclass(frozen=True)
 class ClaudeCheckConfig:
-    enabled: bool
+    enabled: bool                    # full check (notebook 15, section 2)
     model: str = DEFAULT_MODEL
+    skin_gate: bool = False          # "no skin" question only (notebook 15, section 3)
+
+    @property
+    def any(self) -> bool:
+        return self.enabled or self.skin_gate
 
     @classmethod
     def load(cls, path: str | Path) -> "ClaudeCheckConfig":
@@ -153,4 +165,5 @@ class ClaudeCheckConfig:
         if not p.exists():
             return cls(enabled=False)
         c = json.loads(p.read_text())
-        return cls(enabled=bool(c.get("enabled", False)), model=c.get("model", DEFAULT_MODEL))
+        return cls(enabled=bool(c.get("enabled", False)), model=c.get("model", DEFAULT_MODEL),
+                   skin_gate=bool(c.get("skin_gate", False)))
