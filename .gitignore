@@ -28,3 +28,7 @@ app/.dart_tool/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Backend local development
+uploads/
+*.db
