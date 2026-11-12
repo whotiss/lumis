@@ -1,0 +1,14 @@
+{
+ "enabled": false,
+ "skin_gate": true,
+ "model": "claude-haiku-5-5",
+ "decided_on": "SCIN validation",
+ "run": "efficientnetb0_20261109_1427",
+ "rule": {
+  "min_gain": 0.03,
+  "max_answered_drop": 0.15,
+  "min_api_ok": 0.95,
+  "gate_min_caught": 0.8,
+  "gate_max_rejected": 0.02
+ }
+}
