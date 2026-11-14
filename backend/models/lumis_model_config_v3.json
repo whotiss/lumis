@@ -1,0 +1,110 @@
+{
+ "version": "v3",
+ "model_version": "lumis-medsiglip-v3",
+ "encoder": "google/medsiglip-448 image encoder (ONNX)",
+ "onnx_file": "lumis_medsiglip_v3.onnx",
+ "onnx_sha256": "97e526a9c3dc607e4ce6829a509d9c81a99e8c17427a4a8a6ea4279142c7c30a",
+ "head_file": "lumis_head_v3.npz",
+ "classes": [
+  "acne",
+  "eczema",
+  "psoriasis",
+  "scabies",
+  "tinea"
+ ],
+ "logit_adjust": [
+  -0.22778,
+  0.41253,
+  0.27813,
+  -0.64123,
+  0.17835
+ ],
+ "temperature": 1.0073272944425018,
+ "bands": {
+  "high_from": 0.64,
+  "moderate_from": 0.2,
+  "refer_below": 0.2,
+  "answered_target_used": 0.75,
+  "notes": []
+ },
+ "scabies_never_high": true,
+ "preprocessing": {
+  "size": [
+   448,
+   448
+  ],
+  "resample": 3,
+  "rescale_factor": 0.00392156862,
+  "image_mean": [
+   0.5,
+   0.5,
+   0.5
+  ],
+  "image_std": [
+   0.5,
+   0.5,
+   0.5
+  ],
+  "exif_transpose": true,
+  "color": "RGB",
+  "resize_library": "PIL"
+ },
+ "embedding_dim": 1152,
+ "trained_on": {
+  "dermnet_train": 4541,
+  "scin_photos": 1015,
+  "scin_extra_photos": 520
+ },
+ "test": {
+  "scin_test": {
+   "n": 121,
+   "accuracy": 0.6942148760330579,
+   "macro_sensitivity": 0.6568652400231347,
+   "macro_f1": 0.601829234595192,
+   "sens_acne": 0.9,
+   "n_acne": 10,
+   "sens_eczema": 0.7142857142857143,
+   "n_eczema": 77,
+   "sens_psoriasis": 0.5384615384615384,
+   "n_psoriasis": 13,
+   "sens_scabies": 0.5,
+   "n_scabies": 2,
+   "sens_tinea": 0.631578947368421,
+   "n_tinea": 19,
+   "share_shown": 1.0,
+   "accuracy_when_shown": 0.6942148760330579,
+   "share_high": 0.6776859504132231,
+   "accuracy_high": 0.8780487804878049,
+   "share_moderate": 0.32231404958677684,
+   "accuracy_moderate": 0.3076923076923077,
+   "share_refer": 0.0,
+   "accuracy_refer": null
+  },
+  "dermnet_test": {
+   "n": 972,
+   "accuracy": 0.7037037037037037,
+   "macro_sensitivity": 0.7215700510001981,
+   "macro_f1": 0.7119496878797652,
+   "sens_acne": 0.8984375,
+   "n_acne": 128,
+   "sens_eczema": 0.7104377104377104,
+   "n_eczema": 297,
+   "sens_psoriasis": 0.6588235294117647,
+   "n_psoriasis": 255,
+   "sens_scabies": 0.7083333333333334,
+   "n_scabies": 72,
+   "sens_tinea": 0.6318181818181818,
+   "n_tinea": 220,
+   "share_shown": 1.0,
+   "accuracy_when_shown": 0.7037037037037037,
+   "share_high": 0.5997942386831275,
+   "accuracy_high": 0.7993138936535163,
+   "share_moderate": 0.4002057613168724,
+   "accuracy_moderate": 0.5604113110539846,
+   "share_refer": 0.0,
+   "accuracy_refer": null
+  }
+ },
+ "licence_note": "MedSigLIP: Health AI Developer Foundations terms. Training data includes SCIN (SCIN Data Use License).",
+ "created_at": "2026-11-13 14:07"
+}

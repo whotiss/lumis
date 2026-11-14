@@ -1,0 +1,36 @@
+{
+ "model_version": "lumis-medsiglip-v3",
+ "load_seconds": 4.34,
+ "logical_cores": 16,
+ "threads": null,
+ "onnxruntime": "1.31.1",
+ "platform": "Windows-11-10.0.26300-SP0",
+ "processor": "AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD",
+ "photos": [
+  {
+   "photo": "generated 4000x3000 JPEG",
+   "runs": 10,
+   "preprocess": {
+    "median_ms": 249.0,
+    "min_ms": 217.0,
+    "max_ms": 270.1
+   },
+   "model": {
+    "median_ms": 2856.25,
+    "min_ms": 2654.0,
+    "max_ms": 3315.7
+   },
+   "postprocess": {
+    "median_ms": 0.2,
+    "min_ms": 0.2,
+    "max_ms": 0.3
+   },
+   "total": {
+    "median_ms": 3100.05,
+    "min_ms": 2924.4,
+    "max_ms": 3566.5
+   }
+  }
+ ],
+ "measured_at": "2026-11-15 03:00"
+}

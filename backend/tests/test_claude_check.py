@@ -126,7 +126,7 @@ def test_disagreeing_check_lowers_band(make_env):
     client, _ = make_env(FakeClient(answer("B")))                    # B = tinea
     with client:
         body = screen(client, signup(client)).json()
-        assert body["band"] == "moderate" and "doctor" in body["headline"]
+        assert body["band"] == "moderate" and body["headline"].startswith("Possibly") and "doctor" in body["advice"]
 
 
 @pytest.mark.parametrize("payload, code", [(answer(skin=False), "no_skin"), (answer(quality="poor"), "poor_photo")])

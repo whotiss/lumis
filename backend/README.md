@@ -13,7 +13,11 @@ uvicorn app.main:app --reload
 ```
 
 Open http://127.0.0.1:8000/docs to try every endpoint in the browser.
-The model files must be in `models/` first (see `models/README.md`).
+The model files must be in `models/` first (see `models/README.md`): for model v3, download
+`lumis_medsiglip_v3.onnx` (1.71 GB) from Drive `Lumis/exports/model_v3/`. The first start takes a few seconds
+longer because the file's checksum is verified.
+
+To measure the model's speed on this computer: `python scripts/time_model.py`
 Local development uses a SQLite file (`lumis_dev.db`) and stores photos in `uploads/`; both are git-ignored.
 
 ## Tests

@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     jwt_secret: str = DEV_SECRET
     jwt_expire_days: int = 7
     model_dir: Path = BACKEND_DIR / "models"
+    model_config_file: str = "lumis_model_config_v3.json"   # MODEL_CONFIG_FILE; v1: lumis_model_config.json
+    photo_check_file: str = "photo_check_v3.json"           # PHOTO_CHECK_FILE; v1: photo_check.json
+    onnx_threads: int | None = None                    # ONNX_THREADS; default: ONNX Runtime decides (all cores)
     image_dir: Path = BACKEND_DIR / "uploads"         # local image store for development
     max_upload_mb: int = 10
     anthropic_api_key: str | None = None             # ANTHROPIC_API_KEY; the Claude check runs only if set

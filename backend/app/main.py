@@ -42,7 +42,8 @@ def create_app(settings: Settings | None = None, predictor=None, claude_checker=
         app.state.settings = settings
         app.state.session_factory = sessionmaker(engine, expire_on_commit=False)
         seed_conditions(app.state.session_factory)
-        app.state.predictor = predictor or LumisPredictor.from_dir(settings.model_dir)
+        app.state.predictor = predictor or LumisPredictor.from_dir(
+            settings.model_dir, settings.model_config_file, settings.photo_check_file, threads=settings.onnx_threads)
         app.state.storage = LocalImageStorage(settings.image_dir)
         check_cfg = ClaudeCheckConfig.load(settings.model_dir / "claude_check.json")
         app.state.claude_checker = claude_checker or (

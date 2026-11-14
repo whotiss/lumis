@@ -38,6 +38,7 @@ def _own_screening(screening_id: int, user: User, db: Session) -> Screening:
              responses={422: {"description": "Photo check failed: detail.code is 'no_skin', 'poor_photo' or 'nothing_detected', "
                                              "with headline and advice to show"}})
 def create_screening(
+    response: Response,
     image: UploadFile = File(..., description="JPEG, PNG or WebP photo of the skin"),
     duration: str | None = Form(None, description="under_1_week | 1_to_4_weeks | over_1_month"),
     itchy: bool | None = Form(None),
@@ -60,10 +61,14 @@ def create_screening(
         prediction = predictor.predict(data)
     except UnsupportedImageError as exc:
         raise HTTPException(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, str(exc))
+    # speed of each step, for measurements and the app's network log (no health data in it)
+    timing = getattr(prediction, "timing_ms", None)
+    timing_header = {"Server-Timing": ", ".join(f"{k};dur={v}" for k, v in timing.items())} if timing else {}
+    response.headers.update(timing_header)
     if prediction.status != "ok":
         # Photo check failed: nothing is saved, and the app shows this message instead of a result
         raise HTTPException(422, {"code": prediction.status, **PHOTO_CHECK_TEXT[prediction.status],
-                                  "disclaimer": DISCLAIMER})
+                                  "disclaimer": DISCLAIMER}, headers=timing_header or None)
 
     condition = db.get(Condition, prediction.condition)
     if condition is None:
@@ -78,7 +83,8 @@ def create_screening(
         check_status, band = apply_verdict(prediction.band, prediction.condition, verdict,
                                           skin_gate=claude.skin_gate, full=claude.full)
         if check_status != "ok":
-            raise HTTPException(422, {"code": check_status, **PHOTO_CHECK_TEXT[check_status], "disclaimer": DISCLAIMER})
+            raise HTTPException(422, {"code": check_status, **PHOTO_CHECK_TEXT[check_status], "disclaimer": DISCLAIMER},
+                                headers=timing_header or None)
 
     text = result_text(band, condition.name, condition.urgency_default)
     reference = storage.save(user.id, data) if user.consent_storage else None

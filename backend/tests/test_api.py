@@ -26,10 +26,11 @@ class FakePredictor:
                                   cap_at_moderate=["scabies"])
         self.logits = np.array([5.0, 0, 0, 0, 0])
         self.status = "ok"
+        self.timing = None
 
     def predict(self, data):
         preprocess(data, 224)
-        return dataclasses.replace(postprocess(self.logits, self.config), status=self.status)
+        return dataclasses.replace(postprocess(self.logits, self.config), status=self.status, timing_ms=self.timing)
 
 
 def photo(fmt="JPEG"):
@@ -123,7 +124,7 @@ def test_moderate_band(env):
     fake.logits = np.array([0, 1.8, 0, 0, 0])            # eczema at about 0.60
     body = screen(client, signup(client)).json()
     assert body["band"] == "moderate"
-    assert body["headline"] == "Most likely Eczema, but a doctor's check is advised."
+    assert body["headline"] == "Possibly Eczema, but Lumis isn't sure." and body["band_label"] == "Low confidence"
     assert body["recommended_action"] == "see_doctor" and body["show_clinics"] is True
 
 
@@ -252,17 +253,44 @@ def test_conditions_and_model_info(env):
 
 # ---------------------------------------------------------------- the real model
 
-@pytest.mark.skipif(not (MODELS / "lumis_model_config.json").exists(), reason="model not downloaded yet")
-def test_real_model_end_to_end(tmp_path):
+REAL_MODELS = [  # config, photo check, ONNX file, model version, (path to an accuracy in /model test_results, value)
+    ("lumis_model_config.json", "photo_check.json", "lumis_effb0_v1.onnx", "lumis-effb0-v1", (("accuracy",), 0.6553)),
+    ("lumis_model_config_v3.json", "photo_check_v3.json", "lumis_medsiglip_v3.onnx", "lumis-medsiglip-v3",
+     (("scin_test", "accuracy"), 0.6942)),
+]
+
+
+@pytest.mark.parametrize("config_file,photo_check_file,onnx_file,version,expected", REAL_MODELS, ids=["v1", "v3"])
+def test_real_model_end_to_end(tmp_path, config_file, photo_check_file, onnx_file, version, expected):
+    if not (MODELS / onnx_file).exists():
+        pytest.skip(f"{onnx_file} not downloaded yet")
     settings = Settings(database_url=f"sqlite:///{(tmp_path / 't.db').as_posix()}", image_dir=tmp_path / "img",
-                        jwt_secret="test-secret-at-least-32-characters-long", model_dir=MODELS)
+                        jwt_secret="test-secret-at-least-32-characters-long", model_dir=MODELS,
+                        model_config_file=config_file, photo_check_file=photo_check_file)
     with TestClient(create_app(settings)) as client:
-        body = screen(client, signup(client)).json()
-        assert body["band"] in {"high", "moderate", "refer"}
-        assert body["model_version"] == "lumis-effb0-v1"
-        assert client.get("/model").json()["test_results"]["accuracy"] == pytest.approx(0.6553, abs=1e-3)
-        if (MODELS / "photo_check.json").exists():                    # a plain blue picture is not skin
-            b = io.BytesIO()
-            Image.new("RGB", (400, 300), (30, 80, 200)).save(b, "JPEG")
-            r = screen(client, signup(client, "blue@example.com"), data=b.getvalue())
-            assert r.status_code == 422 and r.json()["detail"]["code"] == "no_skin"
+        r = screen(client, signup(client))
+        if r.status_code == 201:
+            assert r.json()["band"] in {"high", "moderate", "refer"} and r.json()["model_version"] == version
+        else:                                                          # random pixels may fail the photo check
+            assert r.status_code == 422
+        assert "model;dur=" in r.headers["server-timing"]
+        results = client.get("/model").json()["test_results"]
+        for key in expected[0]:
+            results = results[key]
+        assert results == pytest.approx(expected[1], abs=1e-3)
+        b = io.BytesIO()                                               # a plain blue picture is not skin
+        Image.new("RGB", (400, 300), (30, 80, 200)).save(b, "JPEG")
+        r = screen(client, signup(client, "blue@example.com"), data=b.getvalue())
+        assert r.status_code == 422 and r.json()["detail"]["code"] == "no_skin"
+
+
+def test_server_timing_header(env):
+    client, fake, _ = env
+    headers = signup(client)
+    assert "server-timing" not in screen(client, headers).headers           # the fake model reports no timing
+    fake.timing = {"preprocess": 12.0, "model": 3400.5, "postprocess": 0.3, "total": 3412.8}
+    r = screen(client, headers)
+    assert r.status_code == 201 and r.headers["server-timing"] == "preprocess;dur=12.0, model;dur=3400.5, postprocess;dur=0.3, total;dur=3412.8"
+    fake.status = "nothing_detected"                                        # also on a failed photo check
+    r = screen(client, headers)
+    assert r.status_code == 422 and "model;dur=3400.5" in r.headers["server-timing"]

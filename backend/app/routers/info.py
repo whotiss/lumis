@@ -21,9 +21,11 @@ def health(request: Request):
 def model_info(request: Request):
     cfg = request.app.state.predictor.config
     test_results = None
-    config_path = request.app.state.settings.model_dir / "lumis_model_config.json"
+    settings = request.app.state.settings
+    config_path = settings.model_dir / settings.model_config_file
     if config_path.exists():
-        test_results = json.loads(config_path.read_text()).get("test_results")
+        c = json.loads(config_path.read_text())
+        test_results = c.get("test_results") or c.get("test")          # v1 key, v3 key
     return ModelInfoOut(model_version=cfg.model_version, classes=cfg.classes,
                         bands={"high_from": cfg.high_from, "refer_below": cfg.refer_below,
                                "never_high": cfg.cap_at_moderate,

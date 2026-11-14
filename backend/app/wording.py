@@ -3,13 +3,17 @@
 
 Band wording decided 2026-11-09: high shows the result; moderate says "most likely [condition], a doctor's
 check is advised"; refer says the result is inconclusive and goes straight to referral, without naming a
-condition. Scabies is never shown as high (cap in app/ml/predictor.py)."""
+condition. Scabies is never shown as high (cap in app/ml/predictor.py).
+
+Changed 2026-11-15 for model v3: on the SCIN phone test, v3's moderate results were right only 31% of the time
+(high: 88%), and v3's bands refer almost nothing. The thresholds were not changed after the test; instead a
+moderate result now says "possibly [condition], Lumis isn't sure" and is labeled low confidence."""
 from dataclasses import dataclass
 
 DISCLAIMER = ("Lumis is a screening aid, not a medical diagnosis. "
               "Only a doctor can diagnose a skin condition.")
 
-BAND_LABELS = {"high": "High confidence", "moderate": "Moderate confidence", "refer": "Inconclusive"}
+BAND_LABELS = {"high": "High confidence", "moderate": "Low confidence", "refer": "Inconclusive"}
 
 
 @dataclass(frozen=True)
@@ -34,12 +38,13 @@ def result_text(band: str, condition_name: str, urgency: str) -> ResultText:
         advice = (f"{condition_name} needs to be confirmed and treated by a doctor, "
                   "and it can spread to others, so please see a doctor soon.")
     elif band == "moderate":
-        advice = "Lumis is not sure enough to rely on this result. Please have it looked at by a doctor."
+        advice = ("Lumis is not sure about this result, so please don't rely on it. "
+                  "Have it checked by a doctor, ideally a dermatologist.")
     else:
         advice = "If it does not improve, spreads, or worries you, please see a doctor."
 
     if band == "moderate":
-        headline = f"Most likely {condition_name}, but a doctor's check is advised."
+        headline = f"Possibly {condition_name}, but Lumis isn't sure."
     else:
         headline = f"This looks most like {condition_name}."
 

@@ -25,3 +25,4 @@ simplejpeg>=1.7
 # Tests
 pytest>=8
 httpx>=0.27
+onnx>=1.16          # builds a tiny stand-in model for the v3 tests
