@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from .config import Settings
 from .models import User
 from .security import read_token
-from .storage import LocalImageStorage
+from .storage import ImageStorage
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -30,7 +30,7 @@ def get_claude_checker(request: Request):
     return getattr(request.app.state, "claude_checker", None)
 
 
-def get_storage(request: Request) -> LocalImageStorage:
+def get_storage(request: Request) -> ImageStorage:
     return request.app.state.storage
 
 

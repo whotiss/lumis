@@ -1,0 +1,29 @@
+# Builds the Lumis server image and stores it in Artifact Registry. Run from the backend folder:
+#   gcloud builds submit --config cloudbuild.yaml --substitutions "_MODEL_BUCKET=<your models bucket>" .
+# Full steps: deploy/README.md
+
+substitutions:
+  _MODEL_BUCKET: ''                        # required: the bucket that holds the model file
+  _MODEL_FILE: lumis_medsiglip_v3.onnx
+  _REGION: asia-southeast1
+  _REPO: lumis
+
+steps:
+  # 1. The 1.7 GB model file is not in git. Fetch it from the bucket (inside Google's network, so it is quick).
+  - name: gcr.io/cloud-builders/gcloud
+    args: ['storage', 'cp', 'gs://${_MODEL_BUCKET}/${_MODEL_FILE}', 'models/${_MODEL_FILE}']
+
+  # 2. Build the image. The Dockerfile checks the model file against its config and fails the build on a mismatch.
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--tag=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/lumis-api:latest'
+      - '--tag=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/lumis-api:${BUILD_ID}'
+      - .
+
+# 3. Push both tags: "latest" is what gets deployed, the build ID keeps each build traceable.
+images:
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/lumis-api:latest'
+  - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/lumis-api:${BUILD_ID}'
+
+timeout: 1800s

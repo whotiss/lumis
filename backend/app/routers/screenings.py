@@ -9,7 +9,7 @@ from ..ml.claude_check import apply_verdict
 from ..ml.predictor import UnsupportedImageError, decode_image
 from ..models import Condition, Screening, User, as_utc
 from ..schemas import ConditionRef, ScreeningOut, SymptomDetails
-from ..storage import LocalImageStorage
+from ..storage import ImageStorage
 from ..wording import BAND_LABELS, DISCLAIMER, PHOTO_CHECK_TEXT, result_text
 
 router = APIRouter(prefix="/screenings", tags=["screenings"])
@@ -44,7 +44,7 @@ def create_screening(
     itchy: bool | None = Form(None),
     changing: bool | None = Form(None),
     user: User = Depends(current_user), db: Session = Depends(get_db), predictor=Depends(get_predictor),
-    storage: LocalImageStorage = Depends(get_storage), settings: Settings = Depends(get_settings),
+    storage: ImageStorage = Depends(get_storage), settings: Settings = Depends(get_settings),
     claude=Depends(get_claude_checker),
 ):
     data = image.file.read(settings.max_upload_bytes + 1)
@@ -119,16 +119,20 @@ def get_screening(screening_id: int, user: User = Depends(current_user), db: Ses
 
 @router.get("/{screening_id}/image", responses={200: {"content": {"image/jpeg": {}}}})
 def get_image(screening_id: int, user: User = Depends(current_user), db: Session = Depends(get_db),
-              storage: LocalImageStorage = Depends(get_storage)):
+              storage: ImageStorage = Depends(get_storage)):
     s = _own_screening(screening_id, user, db)
     if not s.image_reference:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No photo was stored for this screening.")
-    return Response(storage.load(s.image_reference), media_type=storage.media_type(s.image_reference))
+    try:
+        data = storage.load(s.image_reference)
+    except FileNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "The stored photo could not be found.")
+    return Response(data, media_type=storage.media_type(s.image_reference))
 
 
 @router.delete("/{screening_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_screening(screening_id: int, user: User = Depends(current_user), db: Session = Depends(get_db),
-                     storage: LocalImageStorage = Depends(get_storage)):
+                     storage: ImageStorage = Depends(get_storage)):
     s = _own_screening(screening_id, user, db)
     if s.image_reference:
         storage.delete(s.image_reference)

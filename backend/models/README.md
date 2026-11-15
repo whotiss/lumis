@@ -28,6 +28,9 @@ temperature 1.0073; bands high >= 0.64, refer < 0.20 (so nothing is referred); s
 One-time test: SCIN phone photos (121 cases) accuracy 69.4%, average sensitivity 65.7%; DermNet test (972)
 accuracy 70.4%. The 8-bit version was tested in notebook 20 and not adopted (changed too many results).
 
+**On the server:** the 1.71 GB file is uploaded once to a private Cloud Storage bucket and built into the server
+image from there (`cloudbuild.yaml`); the build fails if it does not match the config. See `deploy/README.md`.
+
 **Speed:** the encoder takes about 11 s per photo on Colab's 2 CPU cores. Measure it on any computer with
 `python scripts/time_model.py` (see the script for options); every screening response also carries a
 `Server-Timing` header with the time of each step.

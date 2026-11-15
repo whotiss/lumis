@@ -1,0 +1,15 @@
+# Never put these into the server image
+.env
+*.env
+.venv/
+venv/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+uploads/
+*.db
+tests/
+deploy/
+timing_*.json
+# v1 model file: the server runs v3 (the v3 file is fetched into models/ by cloudbuild.yaml)
+models/lumis_effb0_v1.onnx

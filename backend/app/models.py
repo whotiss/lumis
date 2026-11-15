@@ -12,8 +12,9 @@ def utcnow() -> datetime:
 
 
 def as_utc(dt: datetime) -> datetime:
-    """SQLite returns times without a time zone; they are stored as UTC, so label them as UTC."""
-    return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+    """The API always answers in UTC. SQLite returns times without a time zone (they are stored as UTC, so
+    they are labeled UTC); PostgreSQL returns them in the database session's time zone (converted to UTC)."""
+    return dt.astimezone(timezone.utc) if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 
 class User(Base):

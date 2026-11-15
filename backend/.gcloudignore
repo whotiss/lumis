@@ -1,0 +1,16 @@
+# What "gcloud builds submit" does NOT upload from this folder.
+# Secrets, local data and anything large stay on this computer.
+.env
+*.env
+.venv/
+venv/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+uploads/
+*.db
+tests/
+timing_*.json
+# Model files are not uploaded from here (1.7 GB on every build would be slow):
+# cloudbuild.yaml fetches the v3 file from the models bucket instead.
+models/*.onnx

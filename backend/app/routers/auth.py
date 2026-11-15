@@ -9,7 +9,7 @@ from ..deps import current_user, get_db, get_settings, get_storage
 from ..models import User, as_utc, utcnow
 from ..schemas import ConsentIn, RegisterIn, TokenOut, UserOut
 from ..security import create_token, hash_password, verify_password
-from ..storage import LocalImageStorage
+from ..storage import ImageStorage
 
 router = APIRouter(tags=["account"])
 
@@ -60,7 +60,7 @@ def update_consent(body: ConsentIn, user: User = Depends(current_user), db: Sess
 
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
 def delete_account(user: User = Depends(current_user), db: Session = Depends(get_db),
-                   storage: LocalImageStorage = Depends(get_storage)):
+                   storage: ImageStorage = Depends(get_storage)):
     """Deletes the account, every screening and every stored image."""
     for s in user.screenings:
         if s.image_reference:

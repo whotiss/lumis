@@ -26,6 +26,23 @@ Local development uses a SQLite file (`lumis_dev.db`) and stores photos in `uplo
 python -m pytest -q
 ```
 
+The tests for the server-only parts (production settings, photo storage in a bucket) use stand-ins and need no
+network. Two more run the whole API on a real PostgreSQL database when `TEST_DATABASE_URL` is set to an empty
+test database.
+
+## Deploying (Google Cloud Run)
+
+Step-by-step guide: [`deploy/README.md`](deploy/README.md). In short: the backend and model v3 run on Cloud Run
+in Singapore, the database is PostgreSQL on Neon, stored photos go to a private Cloud Storage bucket, and
+secrets live in Secret Manager. Useful scripts:
+
+| Script | What it does |
+|---|---|
+| `python scripts/check_model.py` | Are the model files present and do they belong together? (also run during the image build) |
+| `python scripts/smoke_test.py URL --photo photo.jpg` | End-to-end check of a running backend; cleans up after itself |
+| `python scripts/time_model.py` | Time per photo on this computer or server |
+| `python deploy/set_secret.py NAME` | Save a secret in Secret Manager with hidden typing |
+
 ## Endpoints (stage 1)
 
 | Method and path | What it does | CP1 |
