@@ -12,5 +12,7 @@
   "gate_max_rejected": 0.02
  },
  "explain": true,
- "explain_decided": "2026-11-17, Phase 5 rules in the build plan: Claude describes the photo for the explanation and never changes the condition or band"
+ "explain_decided": "2026-11-17, Phase 5 rules in the build plan: Claude describes the photo for the explanation and never changes the condition or band",
+ "change_gate": false,
+ "change_gate_note": "Off until notebook 22 passes its pre-declared rules"
 }

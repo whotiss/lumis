@@ -12,7 +12,8 @@ Rules (declared 2026-11-17, before building; build plan, Phase 5):
   - Claude explains Lumis's result and never overrides it. The condition and band come only from the model.
     On the SCIN test cases Claude asked directly was right 55.4% of the time, Lumis v3 69.4%.
   - Claude can only make the advice more careful: no skin -> no result (as before); "not_typical" for Lumis's
-    condition -> the advice recommends a doctor and shows clinics. The band is never changed.
+    condition -> the advice recommends a doctor and shows clinics; no visible skin change (v3, only with change_gate
+    on) -> no result, "Lumis couldn't see a skin problem". The band is never changed.
   - The call starts when the photo arrives and runs while the model runs. The server waits for it at most
     CLAUDE_WAIT_SECONDS after the upload; if it is late, fails or its text does not pass the filter below, the
     result is shown with the general explanation only. Every outcome is recorded with the screening.
@@ -36,14 +37,18 @@ import numpy as np
 from PIL import Image
 
 DEFAULT_MODEL = "claude-haiku-5-5"
-PROMPT_VERSION = "explain-v2.1"
+PROMPT_VERSION = "explain-v3"
 # v1 -> v2 (2026-11-17, after 25 runs on Cloud Run): v1 asked for "one or two sentences" in one field; 10 of 25
 # answers had three sentences and were filtered. v2 asks for exactly two sentences in two separate fields, so the
 # shape of the answer enforces the limit. The filter itself is unchanged.
 # v2 -> v2.1 (same day, 5 more runs): 3 of 5 answers still had an extra sentence inside a field. The prompt is the
 # same; the app now shows the first sentence of each field. Every word Claude wrote is still checked for blocked words.
+# v2.1 -> v3 (2026-11-17, after testing the app on healthy skin): adds question 5, visible_change. The model has no
+# "healthy skin" class, so normal skin was shown as a confident eczema result. With "change_gate" on (only after
+# notebook 22 passes its rules), "no" stops the result. Questions 1 to 4 are word for word as in v2.1.
 MAX_EDGE = 1024              # about 1,300 image tokens; plenty to judge a skin photo
 FITS = ("typical", "partly", "not_typical")
+CHANGES = ("yes", "no", "unsure")
 
 SYSTEM = ("You look at skin photos for Lumis, a skin-condition screening aid used in Malaysia. You do not diagnose. "
           "Part of your answer is shown to the person who took the photo, so write it kindly, in short sentences "
@@ -54,7 +59,8 @@ PROMPT = """Look at this photo.
 2. photo_quality: "good" if the skin area is in focus, close enough and lit well enough to judge its appearance; otherwise "poor", and give the main photo_problem.
 3. seen_1 and seen_2: describe what the skin in the photo looks like in exactly two short sentences, one sentence in each field, each 20 words or fewer: color, shape, size, texture, edges and pattern, and the body area if you can tell. seen_1 starts with "In your photo,". Describe only what is visible. Do not name or suggest any condition, disease, infection or cause, and do not give advice. If no skin is visible, give empty strings.
 4. fit: for each condition below, how well do the visible features match its usual appearance? Answer "typical", "partly" or "not_typical".
-{conditions}"""
+{conditions}
+5. visible_change: is there a visible skin change, such as a rash, spots, bumps, a patch, scaling, blisters or discoloration? Answer "yes", "no" if the skin looks normal (freckles, moles, hair, veins and small old scars count as normal), or "unsure"."""
 
 
 def build_schema(classes: list[str]) -> dict:
@@ -69,8 +75,9 @@ def build_schema(classes: list[str]) -> dict:
             "seen_2": {"type": "string"},
             "fit": {"type": "object", "properties": {c: {"type": "string", "enum": list(FITS)} for c in classes},
                     "required": list(classes), "additionalProperties": False},
+            "visible_change": {"type": "string", "enum": list(CHANGES)},
         },
-        "required": ["skin_visible", "photo_quality", "photo_problem", "seen_1", "seen_2", "fit"],
+        "required": ["skin_visible", "photo_quality", "photo_problem", "seen_1", "seen_2", "fit", "visible_change"],
         "additionalProperties": False,
     }
 
@@ -125,6 +132,7 @@ class ClaudeVerdict:
     seen_raw: str | None = None      # what Claude wrote (kept for the log and RQ3 evidence; never shown if filtered)
     filtered: str | None = None      # why the description is not shown
     fit: dict = field(default_factory=dict)
+    visible_change: str | None = None  # yes | no | unsure (v3)
     error: str | None = None
     model: str | None = None
     prompt_version: str = PROMPT_VERSION
@@ -179,6 +187,9 @@ def parse_response(response, classes: list[str], model: str) -> ClaudeVerdict:
         if any(v not in FITS for v in fit.values()):
             raise ValueError("unknown fit value")
         skin = bool(d["skin_visible"])
+        change = str(d["visible_change"]).lower()
+        if change not in CHANGES:
+            raise ValueError("unknown visible_change value")
         parts = [p for p in (str(d.get("seen_1", "")).strip(), str(d.get("seen_2", "")).strip()) if p]
         raw = " ".join(p if p[-1] in ".!?" else p + "." for p in parts)
         # v2.1: only the first sentence of each field is shown (Claude sometimes writes two per field). The
@@ -194,7 +205,8 @@ def parse_response(response, classes: list[str], model: str) -> ClaudeVerdict:
             seen, why = check_seen(shown)
         return ClaudeVerdict(ok=True, skin_visible=skin, photo_quality=str(d["photo_quality"]).lower(),
                              photo_problem=str(d["photo_problem"]).lower(), seen=seen,
-                             seen_raw=raw, filtered=why if skin else None, fit=fit, model=model)
+                             seen_raw=raw, filtered=why if skin else None, fit=fit, visible_change=change,
+                             model=model)
     except (TypeError, ValueError, KeyError) as exc:
         stop = getattr(response, "stop_reason", None)
         return ClaudeVerdict(ok=False, error=f"unreadable output ({stop}): {type(exc).__name__}", model=model)
@@ -202,12 +214,13 @@ def parse_response(response, classes: list[str], model: str) -> ClaudeVerdict:
 
 class ClaudeChecker:
     def __init__(self, api_key: str, model: str = DEFAULT_MODEL, timeout: float = 10.0, client=None,
-                 skin_gate: bool = True):
+                 skin_gate: bool = True, change_gate: bool = False):
         if client is None:
             import anthropic
             # no retries: the server only waits a few seconds for Claude anyway
             client = anthropic.Anthropic(api_key=api_key, timeout=timeout, max_retries=0)
-        self.client, self.model, self.skin_gate = client, model, skin_gate
+        self.client, self.model = client, model
+        self.skin_gate, self.change_gate = skin_gate, change_gate
 
     def check(self, rgb: np.ndarray, names: dict[str, str]) -> ClaudeVerdict:
         started = time.perf_counter()
@@ -224,10 +237,15 @@ def late(model: str, waited_ms: float) -> ClaudeVerdict:
     return ClaudeVerdict(ok=False, error="late", model=model, ms=round(waited_ms, 1))
 
 
-def gate(verdict: ClaudeVerdict | None, skin_gate: bool = True) -> str:
-    """'no_skin' if Claude says there is no skin (and the gate is on), else 'ok'. Never changes a band."""
-    if verdict is not None and verdict.ok and skin_gate and verdict.skin_visible is False:
+def gate(verdict: ClaudeVerdict | None, skin_gate: bool = True, change_gate: bool = False) -> str:
+    """'no_skin' if Claude sees no skin, 'no_visible_change' if it sees skin that looks normal (each only if its gate
+    is on), else 'ok'. Stops a result or lets it through; never changes a band or picks a condition."""
+    if verdict is None or not verdict.ok:
+        return "ok"
+    if skin_gate and verdict.skin_visible is False:
         return "no_skin"
+    if change_gate and verdict.skin_visible and verdict.visible_change == "no":
+        return "no_visible_change"
     return "ok"
 
 
@@ -235,6 +253,7 @@ def gate(verdict: ClaudeVerdict | None, skin_gate: bool = True) -> str:
 class ClaudeCheckConfig:
     skin_gate: bool = False          # notebook 15, section 3
     explain: bool = False            # Phase 5: describe the photo for the explanation
+    change_gate: bool = False        # notebook 22: normal-looking skin gets no condition
     model: str = DEFAULT_MODEL
 
     @property
@@ -248,4 +267,4 @@ class ClaudeCheckConfig:
             return cls()
         c = json.loads(p.read_text())
         return cls(skin_gate=bool(c.get("skin_gate", False)), explain=bool(c.get("explain", False)),
-                   model=c.get("model", DEFAULT_MODEL))
+                   change_gate=bool(c.get("change_gate", False)), model=c.get("model", DEFAULT_MODEL))

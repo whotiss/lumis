@@ -47,7 +47,8 @@ def _own_screening(screening_id: int, user: User, db: Session) -> Screening:
 
 
 @router.post("", response_model=ScreeningOut, status_code=status.HTTP_201_CREATED,
-             responses={422: {"description": "Photo check failed: detail.code is 'no_skin', 'poor_photo' or 'nothing_detected', "
+             responses={422: {"description": "Photo check failed: detail.code is 'no_skin', 'poor_photo', 'nothing_detected' or "
+                                             "'no_visible_change', "
                                              "with headline and advice to show"}})
 def create_screening(
     response: Response,
@@ -114,8 +115,9 @@ def create_screening(
         timing_header = {"Server-Timing": ", ".join(filter(None, [timing_header.get("Server-Timing"),
                                                                  f'claude;dur={verdict.ms or 0};desc="{verdict.outcome}"']))}
         response.headers.update(timing_header)
-        if gate(verdict, claude.skin_gate) != "ok":
-            raise HTTPException(422, {"code": "no_skin", **PHOTO_CHECK_TEXT["no_skin"], "disclaimer": DISCLAIMER},
+        stop = gate(verdict, claude.skin_gate, getattr(claude, "change_gate", False))
+        if stop != "ok":
+            raise HTTPException(422, {"code": stop, **PHOTO_CHECK_TEXT[stop], "disclaimer": DISCLAIMER},
                                 headers=timing_header or None)
 
     claude_record = verdict.to_dict() if verdict else None

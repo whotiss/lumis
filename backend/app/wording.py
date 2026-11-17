@@ -73,6 +73,13 @@ PHOTO_CHECK_TEXT = {
         "advice": "Lumis couldn't see the skin clearly enough to check it. Retake the photo close up, "
                   "in focus and in good light, with the area filling most of the frame.",
     },
+    # Claude sees skin that looks normal (notebook 22). Never "your skin is healthy": a photo can miss a problem.
+    "no_visible_change": {
+        "headline": "Lumis couldn't see a skin problem in this photo.",
+        "advice": "Lumis found no rash, spots or patch here. This does not mean your skin is healthy. If something "
+                  "bothers you, such as itching, pain or a change, take a close photo of that exact spot in good "
+                  "light, or see a doctor.",
+    },
     "nothing_detected": {
         "headline": "Nothing detected.",
         "advice": "Lumis couldn't find any of the skin conditions it screens for in this photo. "

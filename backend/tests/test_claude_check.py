@@ -47,8 +47,9 @@ class FakeClient:
         return fake_response(self.payload)
 
 
-def answer(skin=True, seen=SEEN, eczema="typical", quality="good", seen_2=""):
+def answer(skin=True, seen=SEEN, eczema="typical", quality="good", seen_2="", change="yes"):
     return {"skin_visible": skin, "photo_quality": quality, "photo_problem": "none", "seen_1": seen, "seen_2": seen_2,
+            "visible_change": change,
             "fit": {c: (eczema if c == "eczema" else "not_typical") for c in CLASSES}}
 
 
@@ -126,6 +127,22 @@ def test_filtered_description_is_recorded_not_shown():
     assert v.outcome.startswith("filtered")
 
 
+def test_visible_change_is_read_and_checked():
+    assert parse_response(fake_response(answer(change="no")), CLASSES, "m").visible_change == "no"
+    assert not parse_response(fake_response(answer(change="maybe")), CLASSES, "m").ok
+    assert "visible_change" in build_request(b"x", NAMES, "m")["extra_body"]["output_config"]["format"]["schema"]["required"]
+
+
+def test_change_gate_only_when_switched_on():
+    normal = parse_response(fake_response(answer(change="no")), CLASSES, "m")
+    unsure = parse_response(fake_response(answer(change="unsure")), CLASSES, "m")
+    assert gate(normal) == "ok"                                   # off by default
+    assert gate(normal, change_gate=True) == "no_visible_change"
+    assert gate(unsure, change_gate=True) == "ok"                 # only a clear "no" stops a result
+    no_skin = parse_response(fake_response(answer(skin=False, seen="", change="no")), CLASSES, "m")
+    assert gate(no_skin, change_gate=True) == "no_skin"           # no skin wins
+
+
 def test_gate_only_stops_no_skin():
     ok = parse_response(fake_response(answer()), CLASSES, "m")
     no = parse_response(fake_response(answer(skin=False, seen="")), CLASSES, "m")
@@ -156,13 +173,13 @@ def test_fixed_sentences_read_at_grade_8_or_below():
 
 @pytest.fixture
 def make_env(tmp_path):
-    def make(fake_client, wait=4.5, logits=(0, 5.0, 0, 0, 3.0)):         # eczema high by default
+    def make(fake_client, wait=4.5, logits=(0, 5.0, 0, 0, 3.0), change_gate=False):   # eczema high by default
         settings = Settings(database_url=f"sqlite:///{(tmp_path / 'c.db').as_posix()}", image_dir=tmp_path / "img",
                             jwt_secret="test-secret-at-least-32-characters-long", claude_wait_seconds=wait,
                             _env_file=None)
         fake = FakePredictor()
         fake.logits = np.array(logits)
-        checker = ClaudeChecker("k", client=fake_client) if fake_client else None
+        checker = ClaudeChecker("k", client=fake_client, change_gate=change_gate) if fake_client else None
         return TestClient(create_app(settings, predictor=fake, claude_checker=checker)), fake
     return make
 
@@ -247,6 +264,19 @@ def test_no_skin_stops_the_result(make_env):
         r = screen(client, h)
         assert r.status_code == 422 and r.json()["detail"]["code"] == "no_skin"
         assert client.get("/screenings", headers=h).json() == []
+
+
+@pytest.mark.parametrize("on,status", [(False, 201), (True, 422)])
+def test_normal_skin_gets_no_condition_when_the_gate_is_on(make_env, on, status):
+    client, _ = make_env(FakeClient(answer(change="no", eczema="not_typical")), change_gate=on)
+    with client:
+        h = signup(client)
+        r = screen(client, h)
+        assert r.status_code == status
+        if on:
+            d = r.json()["detail"]
+            assert d["code"] == "no_visible_change" and "does not mean your skin is healthy" in d["advice"]
+            assert client.get("/screenings", headers=h).json() == []           # nothing saved
 
 
 def test_inconclusive_result_has_no_explanation(make_env):
