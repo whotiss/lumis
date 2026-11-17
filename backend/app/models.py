@@ -45,6 +45,8 @@ class Condition(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True)    # same keys as the model classes
     name: Mapped[str] = mapped_column(String(100))
     category: Mapped[str] = mapped_column(String(100))
+    plain_name: Mapped[str | None] = mapped_column(String(100))         # for sentences: "signs of eczema"
+    about: Mapped[str | None] = mapped_column(Text)                     # what it is, in plain words (Phase 5)
     typical_presentation: Mapped[str] = mapped_column(Text, default="")
     general_guidance: Mapped[str] = mapped_column(Text, default="")
     urgency_default: Mapped[str] = mapped_column(String(20))           # 'routine' or 'see_doctor'

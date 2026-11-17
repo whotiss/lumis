@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     contact_email: str | None = None                 # CONTACT_EMAIL: shown in the consent text (data requests)
     max_upload_mb: int = 10
     anthropic_api_key: str | None = None             # ANTHROPIC_API_KEY; the Claude check runs only if set
+    claude_wait_seconds: float = 4.5                 # CLAUDE_WAIT_SECONDS: longest wait for Claude, from the upload
 
     @property
     def max_upload_bytes(self) -> int:

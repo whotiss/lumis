@@ -75,6 +75,16 @@ class ConditionRef(BaseModel):
     name: str
 
 
+class ExplanationOut(BaseModel):
+    """Shown under a result (Phase 5). Everything except in_your_photo is fixed text from the condition table."""
+    what_it_is: str
+    common_signs: str
+    in_your_photo: str | None = Field(description="Claude's description of the photo and whether it looks typical of "
+                                                  "Lumis's condition; None if Claude's part was skipped or too slow")
+    what_to_do: str
+    photo_based: bool
+
+
 class ScreeningOut(BaseModel):
     id: int
     created_at: datetime
@@ -90,12 +100,14 @@ class ScreeningOut(BaseModel):
     symptom_details: SymptomDetails | None
     image_available: bool
     model_version: str
+    explanation: ExplanationOut | None = Field(None, description="None for an inconclusive result")
 
 
 class ConditionOut(BaseModel):
     id: str
     name: str
     category: str
+    about: str | None = None
     typical_presentation: str
     general_guidance: str
     urgency_default: str

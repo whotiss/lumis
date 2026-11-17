@@ -290,10 +290,11 @@ def test_real_model_end_to_end(tmp_path, config_file, photo_check_file, onnx_fil
 def test_server_timing_header(env):
     client, fake, _ = env
     headers = signup(client)
-    assert "server-timing" not in screen(client, headers).headers           # the fake model reports no timing
+    assert screen(client, headers).headers["server-timing"].startswith("screening;dur=")   # whole screening only
     fake.timing = {"preprocess": 12.0, "model": 3400.5, "postprocess": 0.3, "total": 3412.8}
     r = screen(client, headers)
-    assert r.status_code == 201 and r.headers["server-timing"] == "preprocess;dur=12.0, model;dur=3400.5, postprocess;dur=0.3, total;dur=3412.8"
+    assert r.status_code == 201 and r.headers["server-timing"].startswith(
+        "preprocess;dur=12.0, model;dur=3400.5, postprocess;dur=0.3, total;dur=3412.8, screening;dur=")
     fake.status = "nothing_detected"                                        # also on a failed photo check
     r = screen(client, headers)
     assert r.status_code == 422 and "model;dur=3400.5" in r.headers["server-timing"]

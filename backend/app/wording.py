@@ -10,6 +10,8 @@ Changed 2026-11-15 for model v3: on the SCIN phone test, v3's moderate results w
 moderate result now says "possibly [condition], Lumis isn't sure" and is labeled low confidence."""
 from dataclasses import dataclass
 
+from .ml.claude_check import FITS
+
 DISCLAIMER = ("Lumis is a screening aid, not a medical diagnosis. "
               "Only a doctor can diagnose a skin condition.")
 
@@ -25,7 +27,9 @@ class ResultText:
     show_clinics: bool           # FR6: offer nearby clinics straight away
 
 
-def result_text(band: str, condition_name: str, urgency: str) -> ResultText:
+def result_text(band: str, condition_name: str, urgency: str, photo_fit: str | None = None) -> ResultText:
+    """photo_fit: Claude's view of whether the photo looks typical of the condition. It can only make the advice
+    more careful ("not_typical" -> see a doctor, show clinics); it never changes the band or the condition."""
     if band == "refer":
         return ResultText(
             show_condition=False,
@@ -48,7 +52,10 @@ def result_text(band: str, condition_name: str, urgency: str) -> ResultText:
     else:
         headline = f"This looks most like {condition_name}."
 
-    see_doctor = band == "moderate" or urgency == "see_doctor"
+    if photo_fit == "not_typical" and band == "high" and urgency != "see_doctor":
+        advice = ("The photo does not look typical for this. Please have a doctor check it, "
+                  "ideally a dermatologist.")
+    see_doctor = band == "moderate" or urgency == "see_doctor" or photo_fit == "not_typical"
     return ResultText(show_condition=True, headline=headline, advice=advice,
                       recommended_action="see_doctor" if see_doctor else "monitor", show_clinics=see_doctor)
 
@@ -73,3 +80,46 @@ PHOTO_CHECK_TEXT = {
                   "If you are concerned, retake the photo close up in good light, or see a doctor.",
     },
 }
+
+
+# ---------------------------------------------------------------- explanation (Phase 5)
+
+# Shown after Claude's description of the photo, for the condition Lumis chose. Fixed wording, so Claude never
+# states how well the photo matches in its own words. All at Flesch-Kincaid grade 8 or below (tests).
+FIT_TEXT = {
+    "typical": "These are common signs of {plain}.",
+    "partly": "Some of these can be signs of {plain}, but not all of them.",
+    "not_typical": "These are not typical signs of {plain}. Please have a doctor check it.",
+}
+assert set(FIT_TEXT) == set(FITS)
+
+
+@dataclass(frozen=True)
+class Explanation:
+    what_it_is: str
+    common_signs: str
+    in_your_photo: str | None     # Claude's description + the fit sentence; None if Claude was skipped or late
+    what_to_do: str
+    photo_based: bool
+
+
+def explanation(band: str, condition, claude: dict | None) -> Explanation | None:
+    """The explanation under a result. condition: a Condition row; claude: the stored Claude answer (or None).
+    None for an inconclusive result, which names no condition."""
+    if band == "refer":
+        return None
+    in_photo = None
+    if claude and claude.get("ok") and claude.get("seen"):
+        fit = (claude.get("fit") or {}).get(condition.id)
+        if fit in FIT_TEXT:
+            in_photo = f"{claude['seen']} {FIT_TEXT[fit].format(plain=condition.plain_name or condition.name)}"
+    return Explanation(what_it_is=condition.about or "", common_signs=condition.typical_presentation,
+                       in_your_photo=in_photo, what_to_do=condition.general_guidance,
+                       photo_based=in_photo is not None)
+
+
+def photo_fit(condition_id: str, claude: dict | None) -> str | None:
+    """Claude's fit for Lumis's condition, only if Claude's part ran and its description was shown."""
+    if claude and claude.get("ok") and claude.get("seen"):
+        return (claude.get("fit") or {}).get(condition_id)
+    return None

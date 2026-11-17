@@ -2,7 +2,9 @@
  {
   "id": "acne",
   "name": "Acne",
+  "plain_name": "acne",
   "category": "Inflammatory (hair follicles and oil glands)",
+  "about": "Acne happens when pores get blocked with oil and dead skin. It is very common, especially in teenagers and young adults. It is not caused by being dirty, and it does not spread to other people.",
   "typical_presentation": "Spots such as blackheads, whiteheads, red bumps and sometimes deeper, painful lumps, mostly on the face, chest and back. Very common in teenagers and young adults.",
   "general_guidance": "Wash gently twice a day and avoid squeezing spots, which can leave scars. A pharmacist can explain over-the-counter options. See a doctor if acne is severe, painful, leaving marks or scars, or affecting how you feel.",
   "urgency_default": "routine"
@@ -10,31 +12,39 @@
  {
   "id": "eczema",
   "name": "Eczema",
+  "plain_name": "eczema",
   "category": "Inflammatory (atopic dermatitis and related)",
+  "about": "Eczema is a common, long-term skin problem. The skin gets dry, itchy and easily upset. It often runs in families with asthma or hay fever, and it does not spread to other people.",
   "typical_presentation": "Dry, itchy skin with red or darker patches that can become rough, thickened, cracked or weepy. Often in skin folds such as the inner elbows, behind the knees and on the neck. It tends to come and go in flare-ups.",
-  "general_guidance": "Moisturize often, use mild soap-free cleansers and avoid things that set it off, such as harsh soaps. See a doctor if it is widespread, very itchy, weeping or crusted, or not improving, because skin infections and fungal infections can look similar.",
+  "general_guidance": "Use moisturizer often and wash with a mild, soap-free cleanser. Stay away from things that make it worse, such as harsh soaps. See a doctor if it is spreading, very itchy, weeping or crusted, or not getting better. Skin infections can look like eczema.",
   "urgency_default": "routine"
  },
  {
   "id": "psoriasis",
   "name": "Psoriasis",
+  "plain_name": "psoriasis",
   "category": "Inflammatory (immune-related)",
+  "about": "Psoriasis is a long-term skin problem linked to the immune system. New skin cells build up too fast and form thick, scaly patches. It often comes and goes, and it does not spread to other people.",
   "typical_presentation": "Clearly outlined, raised patches covered with silvery or whitish scale, commonly on the elbows, knees, scalp and lower back. It is long-term and not contagious.",
-  "general_guidance": "Moisturizing can ease dryness and scaling. Psoriasis needs a doctor's diagnosis and is usually managed with treatment a doctor recommends, so see a doctor, especially if patches are spreading or your joints are painful or swollen.",
+  "general_guidance": "Moisturizer can ease dry, scaly skin. A doctor needs to confirm psoriasis and can suggest treatment that works for you. See a doctor, especially if the patches are spreading or your joints are sore or swollen.",
   "urgency_default": "routine"
  },
  {
   "id": "scabies",
   "name": "Scabies",
+  "plain_name": "scabies",
   "category": "Infestation (mites)",
-  "typical_presentation": "Intense itching, usually worse at night, with small bumps or short, thin lines (burrows), often between the fingers, on the wrists, around the waist and in other skin folds. People in the same household are often itchy too.",
+  "about": "Scabies is caused by tiny mites that dig into the top layer of skin. It spreads through close skin contact, often between people who live together. Medicine from a doctor treats it well.",
+  "typical_presentation": "Strong itching that is often worse at night, with small bumps or short, thin lines on the skin. It is common between the fingers, on the wrists, around the waist and in skin folds. People in the same home are often itchy too.",
   "general_guidance": "Scabies spreads through close skin contact and is treated with prescription medicine, so see a doctor. People you live with may need to be checked and treated at the same time.",
   "urgency_default": "see_doctor"
  },
  {
   "id": "tinea",
   "name": "Fungal skin infection (tinea or ringworm)",
+  "plain_name": "a fungal skin infection (tinea)",
   "category": "Infection (fungal)",
+  "about": "A fungal skin infection is caused by a fungus. It is also called ringworm, but no worm is involved. Fungus grows well in hot, damp places, so it is common in Malaysia. It can spread by touch or shared towels.",
   "typical_presentation": "A red or darker, ring-shaped or spreading patch with a scaly, raised edge that is often itchy. Common in hot, humid weather and in areas that stay damp, such as the groin, feet and skin folds.",
   "general_guidance": "Keep the area clean and dry. Do not put steroid creams on it unless a doctor advises, because they can make fungal infections worse. See a doctor or pharmacist if it spreads or does not improve.",
   "urgency_default": "routine"

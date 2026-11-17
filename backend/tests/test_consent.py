@@ -17,7 +17,8 @@ SECRET = "test-secret-at-least-32-characters-long"
 
 # If this fails, the consent wording changed. Anything a person agrees to needs a new CONSENT_VERSION in
 # app/consent.py (everyone is then asked again), then update both values here.
-APPROVED = {"2026-11-17": "65d40a50b6aaccd0"}
+APPROVED = {"2026-11-17": "65d40a50b6aaccd0",
+            "2026-11-17.2": "f628eca84eaef60a"}       # Claude also describes the photo (Phase 5)
 
 
 def test_text_changes_need_a_new_version():

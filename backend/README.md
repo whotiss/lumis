@@ -50,7 +50,7 @@ secrets live in Secret Manager. Useful scripts:
 | POST /auth/register | Create account (Argon2id salted hash), returns token | FR11 |
 | POST /auth/login | Log in (form fields username, password), returns token | FR11 |
 | GET /me, PATCH /me/consent, DELETE /me | Account, time-stamped consent, delete everything | NFR4 |
-| POST /screenings | Upload photo plus optional symptoms, returns band, wording, disclaimer | FR1-4, FR9 |
+| POST /screenings | Upload photo plus optional symptoms, returns band, wording, disclaimer and the explanation (what it is, common signs, Claude's description of the photo, what to do) | FR1-5, FR9 |
 | GET /screenings, GET /screenings/{id} | History, newest first | FR7 |
 | GET /screenings/{id}/image | Stored photo (only if the user consented to storage) | FR7 |
 | DELETE /screenings/{id} | Delete a screening and its photo | FR10 |

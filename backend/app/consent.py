@@ -15,7 +15,7 @@ to agree again before their next screening. tests/test_consent.py fails if the t
 """
 from __future__ import annotations
 
-CONSENT_VERSION = "2026-11-17"
+CONSENT_VERSION = "2026-11-17.2"     # .2: Claude also describes the photo (Phase 5)
 LANGUAGES = ("en", "ms")
 
 _TEXT = {
@@ -32,7 +32,8 @@ _TEXT = {
              "body": "When you do a screening, your photo is sent over an encrypted connection to Lumis's server in "
                      "Singapore (Google Cloud), where the Lumis model analyzes it. The photo is also sent to "
                      "Anthropic, an AI company in the United States, whose Claude model checks that the photo shows "
-                     "skin. Anthropic does not use it to train its models and deletes it within 30 days, unless its "
+                     "skin and describes what it can see, to help explain your result. Anthropic does not use it "
+                     "to train its models and deletes it within 30 days, unless its "
                      "safety systems flag it, in which case it may be kept for up to 2 years. Lumis keeps your "
                      "photo only if you turn on \"Keep my photos\" below."},
             {"heading": "What Lumis keeps",
@@ -78,7 +79,8 @@ _TEXT = {
              "body": "Apabila anda membuat saringan, foto anda dihantar melalui sambungan yang disulitkan ke pelayan "
                      "Lumis di Singapura (Google Cloud), di mana model Lumis menganalisisnya. Foto itu juga "
                      "dihantar kepada Anthropic, sebuah syarikat AI di Amerika Syarikat, yang model Claudenya "
-                     "memeriksa bahawa foto itu menunjukkan kulit. Anthropic tidak menggunakannya untuk melatih "
+                     "memeriksa bahawa foto itu menunjukkan kulit dan menerangkan apa yang dapat dilihat, untuk "
+                     "membantu menjelaskan keputusan anda. Anthropic tidak menggunakannya untuk melatih "
                      "modelnya dan memadamkannya dalam tempoh 30 hari, kecuali jika sistem keselamatannya "
                      "menandakannya, dan dalam keadaan itu ia boleh disimpan sehingga 2 tahun. Lumis menyimpan "
                      "foto anda hanya jika anda menghidupkan \"Simpan foto saya\" di bawah."},

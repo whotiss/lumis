@@ -10,5 +10,7 @@
   "min_api_ok": 0.95,
   "gate_min_caught": 0.8,
   "gate_max_rejected": 0.02
- }
+ },
+ "explain": true,
+ "explain_decided": "2026-11-17, Phase 5 rules in the build plan: Claude describes the photo for the explanation and never changes the condition or band"
 }

@@ -51,8 +51,7 @@ def create_app(settings: Settings | None = None, predictor=None, claude_checker=
         app.state.storage = make_storage(settings)
         check_cfg = ClaudeCheckConfig.load(settings.model_dir / "claude_check.json")
         app.state.claude_checker = claude_checker or (
-            ClaudeChecker(settings.anthropic_api_key, check_cfg.model, skin_gate=check_cfg.skin_gate,
-                          full=check_cfg.enabled)
+            ClaudeChecker(settings.anthropic_api_key, check_cfg.model, skin_gate=check_cfg.skin_gate)
             if check_cfg.any and settings.anthropic_api_key else None)
         missing = set(app.state.predictor.config.classes) - {r["id"] for r in json.loads(CONDITIONS_FILE.read_text())}
         if missing:

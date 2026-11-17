@@ -40,6 +40,8 @@ def check_claude(claude_on: bool, timing: str, failures: list) -> None:
         failures.append("the Claude check is on, but the server did not report it (older server version?)")
     elif 'desc="ok"' in part:
         print("      Claude check ran")
+    elif 'desc="filtered' in part:
+        print("      Claude ran, but its description did not pass the filter, so the general text was shown")
     else:
         failures.append(f"the Claude check is on but did not run: {part.strip()} "
                         "(check the lumis-anthropic-key secret)")
@@ -102,6 +104,12 @@ def main() -> int:
                 s = r.json()
                 step("screening", t, f"{s['band_label']}: {s['headline']}")
                 print(f"      server timing: {timing}")
+                whole = next((p.split("dur=")[1] for p in timing.split(",") if p.strip().startswith("screening;")), None)
+                if whole:
+                    print(f"      whole screening on the server: {float(whole) / 1000:.2f} s (target: 5 s or less)")
+                e = s.get("explanation")
+                if e:
+                    print(f"      in your photo: {e['in_your_photo'] or '(general text only)'}")
                 check_claude(claude_on, timing, failures)
 
                 t = time.perf_counter()

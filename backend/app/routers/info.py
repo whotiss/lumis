@@ -31,7 +31,7 @@ def model_info(request: Request):
                         bands={"high_from": cfg.high_from, "refer_below": cfg.refer_below,
                                "never_high": cfg.cap_at_moderate,
                                "claude_check": request.app.state.claude_checker is not None,
-                               "claude_full_check": getattr(request.app.state.claude_checker, "full", False)},
+                               "claude_explains": request.app.state.claude_checker is not None},
                         test_results=test_results)
 
 
