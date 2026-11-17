@@ -24,9 +24,16 @@ The service scales to zero when nobody uses it, so it costs nothing while idle. 
    with email alerts. This only warns you; it does not stop spending.
 3. **Google Cloud CLI.** Install it from <https://cloud.google.com/sdk/docs/install>, open a **new** terminal and run
    `gcloud init`. Sign in and choose your project.
-4. **Database.** At <https://neon.com> create a free account and a project named `lumis` in region
-   **AWS Asia Pacific (Singapore)**. Copy the **connection string** (it starts with `postgresql://`). Treat it like
-   a password.
+4. **Database.** A free Neon project in region **AWS Asia Pacific (Singapore)**. Link it to the repo with the Neon CLI,
+   which writes the connection strings to `lumis/.env.local` (git-ignored; never open it on screen or paste it
+   anywhere). From the `lumis` folder (needs Node.js):
+   ```powershell
+   npm install -g neon@latest
+   neon login
+   neon init -y --no-agent-setup --no-config --org-id <your org id> --project-id <your project id>
+   ```
+   The backend does not read that file (local development keeps using SQLite); step 6 copies the address from it
+   into Secret Manager.
 5. **Model file.** `backend/models/lumis_medsiglip_v3.onnx` must be on this computer (it already is if the tests pass).
 
 ## Step 1. Names used by every command
@@ -81,12 +88,13 @@ gcloud storage buckets add-iam-policy-binding gs://$UPLOADS --member "serviceAcc
 ## Step 6. Secrets (once)
 
 The helper asks for each value with hidden typing, so nothing ends up on screen or in the terminal history.
-For the database, paste the Neon connection string. For the Anthropic key, paste your Anthropic API key
+The database address is read straight from the file `neon init` wrote, so it is never shown or pasted
+(`DATABASE_URL` is Neon's pooled address, the right one for a server). For the Anthropic key, paste your Anthropic API key
 (the one stored as `ANTHROPIC_API_KEY` in Colab's secrets; it powers the skin check).
 
 ```powershell
 python deploy/set_secret.py lumis-jwt-secret --generate
-python deploy/set_secret.py lumis-database-url
+python deploy/set_secret.py lumis-database-url --from-env-file ../.env.local --env-key DATABASE_URL
 python deploy/set_secret.py lumis-anthropic-key
 foreach ($s in "lumis-jwt-secret", "lumis-database-url", "lumis-anthropic-key") { gcloud secrets add-iam-policy-binding $s --member "serviceAccount:$SA" --role roles/secretmanager.secretAccessor }
 ```

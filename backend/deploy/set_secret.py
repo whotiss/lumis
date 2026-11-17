@@ -3,6 +3,9 @@
     python deploy/set_secret.py lumis-database-url         # asks for the value (typing is hidden)
     python deploy/set_secret.py lumis-anthropic-key
     python deploy/set_secret.py lumis-jwt-secret --generate   # makes a long random value itself
+    python deploy/set_secret.py lumis-database-url --from-env-file ../.env.local --env-key DATABASE_URL
+                                                              # takes the value from a file such as the one
+                                                              # `neon init` writes, without showing it
 
 It creates the secret if it does not exist yet and adds the value as a new version. Spaces and line breaks
 around the value are removed. Needs the gcloud CLI, signed in, with the project already selected.
@@ -22,14 +25,39 @@ def gcloud(*args, value: bytes | None = None) -> subprocess.CompletedProcess:
     return subprocess.run([exe, *args], input=value, capture_output=True)
 
 
+def read_env_value(path: str, key: str) -> str:
+    """The value of KEY=value in a .env file (quotes and an 'export ' prefix allowed). Never printed."""
+    try:
+        lines = open(path, encoding="utf-8-sig").read().splitlines()
+    except OSError as exc:
+        sys.exit(f"Could not read {path}: {exc.strerror}")
+    for line in lines:
+        line = line.strip()
+        if line.startswith("export "):
+            line = line[len("export "):].lstrip()
+        name, sep, value = line.partition("=")
+        if sep and name.strip() == key:
+            value = value.strip()
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in "'\"":
+                value = value[1:-1]
+            if not value:
+                sys.exit(f"{key} is empty in {path}.")
+            return value
+    sys.exit(f"{key} was not found in {path}.")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("name", help="secret name, for example lumis-database-url")
     ap.add_argument("--generate", action="store_true", help="generate a random value instead of asking for one")
+    ap.add_argument("--from-env-file", help="read the value from this .env-style file instead of asking")
+    ap.add_argument("--env-key", default="DATABASE_URL", help="the variable to read from --from-env-file")
     args = ap.parse_args()
 
     if args.generate:
         value = secrets.token_urlsafe(48)
+    elif args.from_env_file:
+        value = read_env_value(args.from_env_file, args.env_key)
     else:
         value = getpass.getpass(f"Paste the value for {args.name} (it stays hidden), then press Enter: ").strip()
         if not value:
