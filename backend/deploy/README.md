@@ -47,6 +47,7 @@ $MODELS  = "${PROJECT}-models"
 $UPLOADS = "${PROJECT}-uploads"
 $SA      = "lumis-api@${PROJECT}.iam.gserviceaccount.com"
 $IMAGE   = "${REGION}-docker.pkg.dev/${PROJECT}/lumis/lumis-api:latest"
+$CONTACT = "your-contact-email@example.com"     # shown in the consent text for data requests
 gcloud config set project $PROJECT
 ```
 
@@ -113,7 +114,7 @@ gcloud builds submit --config cloudbuild.yaml --substitutions "_MODEL_BUCKET=$MO
 One long line. `--max-instances 2` caps how much can ever run at once, which also caps the cost.
 
 ```powershell
-gcloud run deploy lumis-api --image $IMAGE --region $REGION --service-account $SA --allow-unauthenticated --cpu 8 --memory 4Gi --cpu-boost --execution-environment gen2 --concurrency 4 --min-instances 0 --max-instances 2 --timeout 120 --set-env-vars "IMAGE_BUCKET=$UPLOADS" --set-secrets "DATABASE_URL=lumis-database-url:latest,JWT_SECRET=lumis-jwt-secret:latest,ANTHROPIC_API_KEY=lumis-anthropic-key:latest"
+gcloud run deploy lumis-api --image $IMAGE --region $REGION --service-account $SA --allow-unauthenticated --cpu 8 --memory 4Gi --cpu-boost --execution-environment gen2 --concurrency 4 --min-instances 0 --max-instances 2 --timeout 120 --set-env-vars "IMAGE_BUCKET=$UPLOADS,CONTACT_EMAIL=$CONTACT" --set-secrets "DATABASE_URL=lumis-database-url:latest,JWT_SECRET=lumis-jwt-secret:latest,ANTHROPIC_API_KEY=lumis-anthropic-key:latest"
 ```
 
 `--allow-unauthenticated` only means the address is reachable from the internet, which the app needs. Every

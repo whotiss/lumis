@@ -8,7 +8,9 @@ from sqlalchemy.orm import Session
 
 from ..config import Settings
 from ..deps import current_user, get_claude_checker, get_db, get_predictor, get_settings, get_storage
+from ..consent import CONSENT_VERSION
 from ..ml.claude_check import apply_verdict
+from .auth import has_current_consent
 from ..ml.predictor import UnsupportedImageError, decode_image
 from ..models import Condition, Screening, User, as_utc
 from ..schemas import ConditionRef, ScreeningOut, SymptomDetails
@@ -51,6 +53,10 @@ def create_screening(
     storage: ImageStorage = Depends(get_storage), settings: Settings = Depends(get_settings),
     claude=Depends(get_claude_checker),
 ):
+    if not has_current_consent(user):
+        # Nothing is analyzed or sent anywhere until the person has agreed to the current consent text
+        raise HTTPException(status.HTTP_403_FORBIDDEN, {"code": "consent_required", "current_version": CONSENT_VERSION,
+                                                        "message": "Please read and agree to the consent text first."})
     data = image.file.read(settings.max_upload_bytes + 1)
     if not data:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "The photo is empty.")

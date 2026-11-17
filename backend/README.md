@@ -56,5 +56,7 @@ secrets live in Secret Manager. Useful scripts:
 | DELETE /screenings/{id} | Delete a screening and its photo | FR10 |
 | GET /conditions | Reference information for the five conditions | FR8 |
 | GET /model, GET /health | Model version and test results; health check | NFR7 |
+| GET /consent?lang=en or ms | Consent text to show before registering (versioned; English and Malay) | NFR4 |
+| POST /me/consent/accept | Agree to a new consent version; screenings are refused until then | NFR4 |
 
 All result wording lives in `app/wording.py`, so screening-aid positioning (NFR8) is enforced in one place.

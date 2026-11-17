@@ -10,6 +10,7 @@ from PIL import Image
 
 from app.config import Settings
 from app.main import create_app
+from app.consent import CONSENT_VERSION
 from app.ml.claude_check import (ClaudeChecker, ClaudeVerdict, SCHEMA, apply_verdict, build_request,
                                  parse_response, prepare_image)
 from tests.test_api import FakePredictor, photo, screen, signup
@@ -179,7 +180,7 @@ def test_claude_outcome_is_reported(make_env, caplog):
 
     client, _ = make_env(Failing())
     with client:
-        h = {"Authorization": f"Bearer {client.post('/auth/register', json={'email': 'k@example.com', 'password': 'correct horse'}).json()['access_token']}"}
+        h = {"Authorization": f"Bearer {client.post('/auth/register', json={'email': 'k@example.com', 'password': 'correct horse', 'accept_consent_version': CONSENT_VERSION, 'confirm_adult': True}).json()['access_token']}"}
         with caplog.at_level(logging.WARNING, logger="lumis.screenings"):
             r = client.post("/screenings", headers=h, files={"image": ("p.jpg", photo(), "image/jpeg")})
     assert r.status_code == 201

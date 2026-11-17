@@ -11,11 +11,14 @@ from PIL import Image
 
 from app.config import Settings
 from app.main import create_app
+from app.consent import CONSENT_VERSION
 from app.ml.predictor import ModelConfig, postprocess, preprocess
 from app.wording import DISCLAIMER
 
 MODELS = Path(__file__).resolve().parents[1] / "models"
 CLASSES = ["acne", "eczema", "psoriasis", "scabies", "tinea"]
+
+CONSENT = {"accept_consent_version": CONSENT_VERSION, "confirm_adult": True}   # the two required boxes
 
 
 class FakePredictor:
@@ -50,7 +53,7 @@ def env(tmp_path):
 
 
 def signup(client, email="zan@example.com", consent_storage=True):
-    r = client.post("/auth/register", json={"email": email, "password": "correct horse", "consent_storage": consent_storage})
+    r = client.post("/auth/register", json={**CONSENT, "email": email, "password": "correct horse", "consent_storage": consent_storage})
     assert r.status_code == 201, r.text
     return {"Authorization": f"Bearer {r.json()['access_token']}"}
 
@@ -74,8 +77,8 @@ def test_register_login_me(env):
 def test_account_errors(env):
     client, _, _ = env
     signup(client)
-    assert client.post("/auth/register", json={"email": "zan@example.com", "password": "another one"}).status_code == 409
-    assert client.post("/auth/register", json={"email": "x@example.com", "password": "short"}).status_code == 422
+    assert client.post("/auth/register", json={**CONSENT, "email": "zan@example.com", "password": "another one"}).status_code == 409
+    assert client.post("/auth/register", json={**CONSENT, "email": "x@example.com", "password": "short"}).status_code == 422
     assert client.post("/auth/login", data={"username": "zan@example.com", "password": "wrong pass"}).status_code == 401
     assert client.get("/me").status_code == 401
     assert client.get("/me", headers={"Authorization": "Bearer nonsense"}).status_code == 401

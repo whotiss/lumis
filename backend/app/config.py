@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     image_dir: Path = BACKEND_DIR / "uploads"         # local image store for development
     image_bucket: str | None = None                  # IMAGE_BUCKET: Cloud Storage bucket for photos (production)
     log_level: str = "INFO"
+    contact_email: str | None = None                 # CONTACT_EMAIL: shown in the consent text (data requests)
     max_upload_mb: int = 10
     anthropic_api_key: str | None = None             # ANTHROPIC_API_KEY; the Claude check runs only if set
 
@@ -38,6 +39,9 @@ class Settings(BaseSettings):
                 raise RuntimeError("Set JWT_SECRET to a long random value in production.")
             if self.database_url.startswith("sqlite"):
                 raise RuntimeError("Production must use PostgreSQL (DATABASE_URL).")
+            if not self.contact_email:
+                raise RuntimeError("Set CONTACT_EMAIL in production: the consent text must tell people whom to "
+                                   "contact about their data.")
             if not self.image_bucket:
                 raise RuntimeError("Set IMAGE_BUCKET in production: the server's own disk is temporary, "
                                    "so photos saved there would be lost.")

@@ -71,7 +71,14 @@ def main() -> int:
             step("model info", t, f"bands {info['bands']}")
 
             t = time.perf_counter()
-            r = c.post("/auth/register", json={"email": email, "password": password, "consent_storage": True})
+            consent = c.get("/consent", params={"lang": "en"}).json()
+            assert c.get("/consent", params={"lang": "ms"}).json()["version"] == consent["version"]
+            required = [i["id"] for i in consent["items"] if i["required"]]
+            step("consent text (English and Malay)", t, f"version {consent['version']}, required: {', '.join(required)}")
+
+            t = time.perf_counter()
+            r = c.post("/auth/register", json={"email": email, "password": password, "consent_storage": True,
+                                               "accept_consent_version": consent["version"], "confirm_adult": True})
             r.raise_for_status()
             headers = {"Authorization": f"Bearer {r.json()['access_token']}"}
             step("register temporary account", t)

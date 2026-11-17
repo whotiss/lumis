@@ -1,13 +1,14 @@
 """Public information: health check, model version (NFR7), condition reference (FR8)."""
 import json
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ..deps import get_db
+from ..consent import LANGUAGES, consent_document
+from ..deps import get_db, get_settings
 from ..models import Condition
-from ..schemas import ConditionOut, ModelInfoOut
+from ..schemas import ConditionOut, ConsentOut, ModelInfoOut
 
 router = APIRouter(tags=["info"])
 
@@ -38,3 +39,12 @@ def model_info(request: Request):
 def conditions(db: Session = Depends(get_db)):
     return [ConditionOut.model_validate(c, from_attributes=True)
             for c in db.scalars(select(Condition).order_by(Condition.name))]
+
+
+@router.get("/consent", response_model=ConsentOut)
+def consent(lang: str = "en", settings=Depends(get_settings)):
+    """The consent screen (NFR4, PDPA): shown before registering, and again whenever its version changes.
+    `lang` is "en" or "ms" (Bahasa Malaysia); both must be offered."""
+    if lang not in LANGUAGES:
+        raise HTTPException(422, f"lang must be one of {list(LANGUAGES)}")
+    return consent_document(lang, settings.contact_email or "the Lumis project team")

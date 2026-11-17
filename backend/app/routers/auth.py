@@ -5,9 +5,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..config import Settings
+from ..consent import CONSENT_VERSION
 from ..deps import current_user, get_db, get_settings, get_storage
 from ..models import User, as_utc, utcnow
-from ..schemas import ConsentIn, RegisterIn, TokenOut, UserOut
+from ..schemas import AcceptConsentIn, ConsentIn, RegisterIn, TokenOut, UserOut
 from ..security import create_token, hash_password, verify_password
 from ..storage import ImageStorage
 
@@ -16,16 +17,35 @@ router = APIRouter(tags=["account"])
 
 def _user_out(user: User) -> UserOut:
     return UserOut(id=user.id, email=user.email, consent_storage=user.consent_storage,
-                   consent_location=user.consent_location, created_at=as_utc(user.created_at))
+                   consent_location=user.consent_location, consent_version=user.terms_version,
+                   consent_current=has_current_consent(user), created_at=as_utc(user.created_at))
+
+
+def has_current_consent(user: User) -> bool:
+    return user.terms_version == CONSENT_VERSION and bool(user.adult_confirmed)
+
+
+def _check_consent(version: str, adult: bool) -> None:
+    """Explicit consent: the required boxes must have been ticked, on the text that is current now."""
+    if version != CONSENT_VERSION:
+        raise HTTPException(status.HTTP_409_CONFLICT, {"code": "consent_outdated", "current_version": CONSENT_VERSION,
+                                                       "message": "The consent text has changed. Please read it again."})
+    if not adult:
+        raise HTTPException(422,
+                            {"code": "not_adult", "message": "Lumis is for people aged 18 and over."})
 
 
 @router.post("/auth/register", response_model=TokenOut, status_code=status.HTTP_201_CREATED)
 def register(body: RegisterIn, db: Session = Depends(get_db), settings: Settings = Depends(get_settings)):
+    _check_consent(body.accept_consent_version, body.confirm_adult)
     email = body.email.lower()
     if db.scalar(select(User).where(User.email == email)):
         raise HTTPException(status.HTTP_409_CONFLICT, "An account with this email already exists.")
-    user = User(email=email, password_hash=hash_password(body.password), consent_storage=body.consent_storage,
-                consent_storage_at=utcnow() if body.consent_storage else None)
+    now = utcnow()
+    user = User(email=email, password_hash=hash_password(body.password),
+                terms_version=CONSENT_VERSION, terms_accepted_at=now, adult_confirmed=True,
+                consent_storage=body.consent_storage, consent_storage_at=now if body.consent_storage else None,
+                consent_location=body.consent_location, consent_location_at=now if body.consent_location else None)
     db.add(user)
     db.commit()
     return TokenOut(access_token=create_token(user.id, settings.jwt_secret, settings.jwt_expire_days))
@@ -58,10 +78,19 @@ def update_consent(body: ConsentIn, user: User = Depends(current_user), db: Sess
     return _user_out(user)
 
 
+@router.post("/me/consent/accept", response_model=UserOut)
+def accept_consent(body: AcceptConsentIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Agree to the current consent text (after it changed, or for an account made before consent existed)."""
+    _check_consent(body.version, body.confirm_adult)
+    user.terms_version, user.terms_accepted_at, user.adult_confirmed = CONSENT_VERSION, utcnow(), True
+    db.commit()
+    return _user_out(user)
+
+
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
 def delete_account(user: User = Depends(current_user), db: Session = Depends(get_db),
                    storage: ImageStorage = Depends(get_storage)):
-    """Deletes the account, every screening and every stored image."""
+    """Deletes the account, every screening and every stored image. This is also how consent is withdrawn."""
     for s in user.screenings:
         if s.image_reference:
             storage.delete(s.image_reference)

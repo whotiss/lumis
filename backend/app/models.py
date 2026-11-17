@@ -28,6 +28,10 @@ class User(Base):
     consent_storage_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     consent_location: Mapped[bool] = mapped_column(Boolean, default=False)
     consent_location_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # The consent text version the person explicitly agreed to (app/consent.py) and when; None = not yet.
+    terms_version: Mapped[str | None] = mapped_column(String(20))
+    terms_accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    adult_confirmed: Mapped[bool | None] = mapped_column(Boolean)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     screenings: Mapped[list["Screening"]] = relationship(back_populates="user", cascade="all, delete-orphan",

@@ -15,23 +15,26 @@ from PIL import Image
 from app.config import DEV_SECRET, Settings
 from app.db import make_engine, normalize_url
 from app.main import create_app
+from app.consent import CONSENT_VERSION
 from app.storage import GCSImageStorage, LocalImageStorage, make_storage
 
 from .test_api import FakePredictor
 
 SECRET = "test-secret-at-least-32-characters-long"
 
+CONSENT = {"accept_consent_version": CONSENT_VERSION, "confirm_adult": True}   # the two required boxes
+
 
 # ---------------------------------------------------------------- production settings
 
 def test_production_refuses_development_defaults(tmp_path):
     good = dict(environment="production", jwt_secret=SECRET, database_url="postgresql://u:p@host/db",
-                image_bucket="lumis-uploads")
+                image_bucket="lumis-uploads", contact_email="lumis@example.com")
     good["_env_file"] = None
     Settings(**good).check()                                                   # complete: accepted
     for change, message in [({"jwt_secret": DEV_SECRET}, "JWT_SECRET"), ({"jwt_secret": "short"}, "JWT_SECRET"),
                             ({"database_url": f"sqlite:///{tmp_path}/x.db"}, "PostgreSQL"),
-                            ({"image_bucket": None}, "IMAGE_BUCKET")]:
+                            ({"image_bucket": None}, "IMAGE_BUCKET"), ({"contact_email": None}, "CONTACT_EMAIL")]:
         with pytest.raises(RuntimeError, match=message):
             Settings(**{**good, **change}).check()
     Settings(environment="development", _env_file=None).check()                # development: defaults are fine
@@ -148,7 +151,7 @@ def test_api_with_bucket_storage(tmp_path):
     with TestClient(app) as client:
         app.state.storage = GCSImageStorage("lumis-uploads", client=client_gcs)
         objects = client_gcs.buckets["lumis-uploads"]
-        r = client.post("/auth/register", json={"email": "a@example.com", "password": "correct horse", "consent_storage": True})
+        r = client.post("/auth/register", json={**CONSENT, "email": "a@example.com", "password": "correct horse", "consent_storage": True})
         h = {"Authorization": f"Bearer {r.json()['access_token']}"}
         data = jpeg(1)
         ids = [client.post("/screenings", headers=h, files={"image": ("p.jpg", data, "image/jpeg")}).json()["id"] for _ in range(2)]
@@ -174,7 +177,8 @@ def pg_client(tmp_path):
         for table in ("screenings", "users", "conditions"):
             conn.execute(text(f"DROP TABLE IF EXISTS {table} CASCADE"))
     engine.dispose()
-    settings = Settings(environment="production", database_url=PG_URL, jwt_secret=SECRET, image_bucket="lumis-uploads")
+    settings = Settings(environment="production", database_url=PG_URL, jwt_secret=SECRET, image_bucket="lumis-uploads",
+                        contact_email="lumis@example.com")
     app = create_app(settings, predictor=FakePredictor())
     gcs = FakeClient()
     with TestClient(app) as client:
@@ -195,10 +199,10 @@ def test_postgres_full_flow(pg_client):
     client, objects = pg_client
     assert client.get("/health").json()["status"] == "ok"
     assert len(client.get("/conditions").json()) == 5
-    r = client.post("/auth/register", json={"email": "Pg@Example.com", "password": "correct horse", "consent_storage": True})
+    r = client.post("/auth/register", json={**CONSENT, "email": "Pg@Example.com", "password": "correct horse", "consent_storage": True})
     assert r.status_code == 201
     h = {"Authorization": f"Bearer {r.json()['access_token']}"}
-    assert client.post("/auth/register", json={"email": "pg@example.com", "password": "another one"}).status_code == 409
+    assert client.post("/auth/register", json={**CONSENT, "email": "pg@example.com", "password": "another one"}).status_code == 409
     assert client.post("/auth/login", data={"username": "pg@example.com", "password": "correct horse"}).status_code == 200
     data = jpeg(2)
     s = client.post("/screenings", headers=h, files={"image": ("p.jpg", data, "image/jpeg")},
@@ -220,9 +224,10 @@ def test_postgres_full_flow(pg_client):
 def test_postgres_restart_keeps_data(pg_client):
     """A second start against the same database (a new server instance) must not wipe or break anything."""
     client, _ = pg_client
-    r = client.post("/auth/register", json={"email": "stay@example.com", "password": "correct horse"})
+    r = client.post("/auth/register", json={**CONSENT, "email": "stay@example.com", "password": "correct horse"})
     h = {"Authorization": f"Bearer {r.json()['access_token']}"}
-    settings = Settings(environment="production", database_url=PG_URL, jwt_secret=SECRET, image_bucket="lumis-uploads")
+    settings = Settings(environment="production", database_url=PG_URL, jwt_secret=SECRET, image_bucket="lumis-uploads",
+                        contact_email="lumis@example.com")
     with TestClient(create_app(settings, predictor=FakePredictor())) as second:
         assert second.get("/me", headers=h).json()["email"] == "stay@example.com"
         assert len(second.get("/conditions").json()) == 5

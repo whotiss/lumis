@@ -6,11 +6,10 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
-from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
 
 from .config import Settings, get_settings
-from .db import Base, make_engine
+from .db import Base, add_missing_columns, make_engine
 from .ml.claude_check import ClaudeCheckConfig, ClaudeChecker
 from .ml.predictor import LumisPredictor
 from .models import Condition
@@ -39,10 +38,9 @@ def create_app(settings: Settings | None = None, predictor=None, claude_checker=
     async def lifespan(app: FastAPI):
         engine = make_engine(settings.database_url)
         Base.metadata.create_all(engine)
-        cols = {c["name"] for c in inspect(engine).get_columns("screenings")}
-        if "model_band" not in cols:
-            raise RuntimeError("The database was made by an older version of Lumis. For local development, "
-                               "delete backend/lumis_dev.db and start again.")
+        added = add_missing_columns(engine)          # e.g. the consent columns, on a database made before them
+        if added:
+            logging.getLogger("lumis").info("database updated, columns added: %s", ", ".join(added))
         app.state.settings = settings
         app.state.session_factory = sessionmaker(engine, expire_on_commit=False)
         seed_conditions(app.state.session_factory)

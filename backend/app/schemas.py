@@ -8,11 +8,15 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 class RegisterIn(BaseModel):
     # Example shown on the /docs page, so "Try it out" then "Execute" works as it is
     model_config = ConfigDict(json_schema_extra={"example": {
-        "email": "demo@lumis.app", "password": "lumis-demo-123", "consent_storage": True}})
+        "email": "demo@lumis.app", "password": "lumis-demo-123", "accept_consent_version": "2026-11-17",
+        "confirm_adult": True, "consent_storage": True, "consent_location": False}})
 
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
+    accept_consent_version: str = Field(description="The version from GET /consent that the person ticked")
+    confirm_adult: bool = Field(description="The required 'I am 18 or older' box")
     consent_storage: bool = False
+    consent_location: bool = False
 
 
 class TokenOut(BaseModel):
@@ -25,7 +29,33 @@ class UserOut(BaseModel):
     email: str
     consent_storage: bool
     consent_location: bool
+    consent_version: str | None              # what the person agreed to; compare with GET /consent
+    consent_current: bool                    # False: show the consent screen again before the next screening
     created_at: datetime
+
+
+class AcceptConsentIn(BaseModel):
+    version: str
+    confirm_adult: bool
+
+
+class ConsentItemOut(BaseModel):
+    id: str
+    required: bool
+    label: str
+
+
+class ConsentSectionOut(BaseModel):
+    heading: str
+    body: str
+
+
+class ConsentOut(BaseModel):
+    version: str
+    language: Literal["en", "ms"]
+    title: str
+    sections: list[ConsentSectionOut]
+    items: list[ConsentItemOut]
 
 
 class ConsentIn(BaseModel):
