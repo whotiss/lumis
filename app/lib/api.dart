@@ -146,16 +146,38 @@ class Api {
 
   /// Sends the photo. Throws ApiException with code no_skin / poor_photo / nothing_detected when the photo
   /// check stops it (use [photoProblem] to read the message), consent_required when consent is outdated.
-  Future<Screening> createScreening(Uint8List jpeg, SymptomDetails details) async {
-    final request = http.MultipartRequest('POST', _uri('/screenings'))
+  ///
+  /// [onUpload] reports how much of the photo has been sent (0 to 1), so the analyzing screen can show real
+  /// progress for that step. The rest of the wait (the model and Claude) has no progress to report.
+  Future<Screening> createScreening(Uint8List jpeg, SymptomDetails details,
+      {void Function(double sent)? onUpload}) async {
+    final form = http.MultipartRequest('POST', _uri('/screenings'))
       ..headers.addAll(_auth)
       ..files.add(http.MultipartFile.fromBytes('image', jpeg,
           filename: 'photo.jpg', contentType: MediaType('image', 'jpeg')));
-    if (details.duration != null) request.fields['duration'] = details.duration!;
-    if (details.itchy != null) request.fields['itchy'] = '${details.itchy}';
-    if (details.changing != null) request.fields['changing'] = '${details.changing}';
-    final r = await _send(() async => http.Response.fromStream(await _client.send(request)),
-        timeout: screeningTimeout);
+    if (details.duration != null) form.fields['duration'] = details.duration!;
+    if (details.itchy != null) form.fields['itchy'] = '${details.itchy}';
+    if (details.changing != null) form.fields['changing'] = '${details.changing}';
+    final r = await _send(() async {
+      final total = form.contentLength;
+      final body = form.finalize();
+      final request = http.StreamedRequest('POST', form.url)
+        ..headers.addAll(form.headers)
+        ..contentLength = total;
+      var sent = 0;
+      body.listen(
+        (chunk) {
+          sent += chunk.length;
+          if (total > 0) onUpload?.call(sent / total);
+          request.sink.add(chunk);
+        },
+        onDone: request.sink.close,
+        onError: request.sink.addError,
+        cancelOnError: true,
+      );
+      return http.Response.fromStream(await _client.send(request));
+    }, timeout: screeningTimeout);
+    onUpload?.call(1);
     return Screening.fromJson(_json(r) as Map<String, dynamic>);
   }
 
@@ -177,6 +199,9 @@ class Api {
   }
 
   // ------------------------------------------------------------------ reference information
+
+  /// The model in use and its test results (for the "How reliable Lumis is" part of the doctor's PDF).
+  Future<ModelInfo> modelInfo() async => ModelInfo.fromJson(await _get('/model') as Map<String, dynamic>);
 
   Future<List<Condition>> conditions() async =>
       [for (final c in await _get('/conditions') as List) Condition.fromJson(c as Map<String, dynamic>)];

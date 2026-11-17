@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Log in')),
+      appBar: lumisAppBar(context, title: 'Log in'),
       body: Form(
         key: _form,
         child: AutofillGroup(

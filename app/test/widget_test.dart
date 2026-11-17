@@ -1,6 +1,7 @@
 // Tests that need no server and no phone: the API's JSON is read correctly, and the result screen shows what the
 // server sent, including the screening-aid statement. Run with: flutter test
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:lumis/api.dart';
 import 'package:lumis/models.dart';
+import 'package:lumis/report_pdf.dart';
 import 'package:lumis/screens/result_screen.dart';
 import 'package:lumis/theme.dart';
 import 'package:lumis/widgets.dart';
@@ -39,10 +41,12 @@ Screening sample({String band = 'high', bool explanation = true}) {
 
 Widget wrap(Widget child, {Api? api}) => Provider<Api>.value(
       value: api ?? Api(client: MockClient((_) async => http.Response('', 500))),
-      child: MaterialApp(theme: lumisTheme(), home: child),
+      child: MaterialApp(theme: lumisTheme(Brightness.light), home: child),
     );
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('reading the API', () {
     test('a screening with its explanation', () {
       final s = sample();
@@ -133,14 +137,17 @@ void main() {
 
   group('result screen', () {
     testWidgets('shows the condition, the band, the explanation and the screening-aid statement', (tester) async {
+      final semantics = tester.ensureSemantics();
       await tester.pumpWidget(wrap(ResultScreen(screening: sample())));
       expect(find.textContaining('This looks most like'), findsOneWidget);
-      expect(find.text('High confidence'), findsOneWidget);
+      expect(find.text('High'), findsOneWidget); // the bright step of the confidence scale
+      expect(find.bySemanticsLabel('Confidence: High confidence'), findsOneWidget);
       expect(find.textContaining('screening aid, not a medical diagnosis'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('In your photo'), 200);
-      expect(find.text('In your photo'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('Common signs'), 200);
-      expect(find.text('Common signs'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('IN YOUR PHOTO'), 200);
+      expect(find.text('IN YOUR PHOTO'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('COMMON SIGNS'), 200);
+      expect(find.text('COMMON SIGNS'), findsOneWidget);
+      semantics.dispose();
     });
 
     testWidgets('an inconclusive result shows no explanation and offers clinics', (tester) async {
@@ -152,14 +159,61 @@ void main() {
         ..['show_clinics'] = true
         ..['headline'] = "Lumis can't tell what this is from this photo.";
       await tester.pumpWidget(wrap(ResultScreen(screening: Screening.fromJson(j))));
-      expect(find.text('In your photo'), findsNothing);
+      expect(find.text('IN YOUR PHOTO'), findsNothing);
+      expect(find.text('Inconclusive'), findsWidgets); // named as inconclusive, no condition
       expect(find.text('Find a dermatologist near you'), findsOneWidget);
     });
 
-    testWidgets('confidence is shown as a band, never a percentage', (tester) async {
-      await tester.pumpWidget(wrap(const Scaffold(body: BandIndicator(band: 'moderate', label: 'Low confidence'))));
-      expect(find.text('Low confidence'), findsOneWidget);
+    testWidgets('confidence is shown as a three-step scale, never a percentage', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await tester.pumpWidget(wrap(const Scaffold(body: ConfidenceScale(band: 'moderate', label: 'Low confidence'))));
+      expect(find.text('Inconclusive'), findsOneWidget);
+      expect(find.text('Low'), findsOneWidget);
+      expect(find.text('High'), findsOneWidget);
+      expect(find.text('Moderate'), findsNothing); // the moderate band is labeled low (decided 2026-11-15)
+      expect(find.bySemanticsLabel('Confidence: Low confidence'), findsOneWidget);
       expect(find.textContaining('%'), findsNothing);
+      expect(ConfidenceScale.stepFor('moderate'), 1);
+      expect(ConfidenceScale.stepFor('refer'), 0);
+      semantics.dispose();
+    });
+
+    test('condition names split into a plain name and other names', () {
+      expect(splitConditionName('Fungal skin infection (tinea or ringworm)'),
+          ('Fungal skin infection', 'Tinea or ringworm'));
+      expect(splitConditionName('Acne'), ('Acne', null));
+    });
+  });
+
+  group('sending a photo', () {
+    test('reports upload progress up to the whole photo', () async {
+      final progress = <double>[];
+      final api = Api(client: MockClient((r) async => http.Response(screeningJson, 200)));
+      final s = await api.createScreening(Uint8List(50000), const SymptomDetails(), onUpload: progress.add);
+      expect(s.id, 7);
+      expect(progress, isNotEmpty);
+      expect(progress.last, 1.0);
+      for (var i = 1; i < progress.length; i++) {
+        expect(progress[i], greaterThanOrEqualTo(progress[i - 1]));
+      }
+    });
+  });
+
+  group('doctor PDF', () {
+    test('model test results are read from GET /model', () {
+      final m = ModelInfo.fromJson(jsonDecode('''
+        {"model_version": "lumis-medsiglip-v3", "classes": ["acne", "eczema", "psoriasis", "scabies", "tinea"],
+         "bands": {}, "test_results": {
+           "scin_test": {"n": 121, "accuracy": 0.694, "accuracy_high": 0.878, "accuracy_moderate": 0.308},
+           "dermnet_test": {"n": 972, "accuracy": 0.704}}}''') as Map<String, dynamic>);
+      expect(m.phoneTest!.n, 121);
+      expect(m.phoneTest!.accuracyLow, 0.308);
+      expect(m.clinicalTest!.accuracyHigh, isNull);
+    });
+
+    test('builds a one-page PDF without a photo or test results', () async {
+      final bytes = await buildDoctorReport(s: sample());
+      expect(String.fromCharCodes(bytes.take(5)), '%PDF-');
     });
   });
 }

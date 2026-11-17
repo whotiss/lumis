@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../api.dart';
 import '../auth_state.dart';
 import '../models.dart';
+import '../sparkle.dart';
 import '../widgets.dart';
 import 'register_screen.dart';
 
@@ -86,8 +87,9 @@ class _ConsentScreenState extends State<ConsentScreen> {
     final t = Theme.of(context).textTheme;
     final view = widget.mode == ConsentMode.view;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.mode == ConsentMode.update ? 'Updated terms' : 'Your consent'),
+      appBar: lumisAppBar(
+        context,
+        title: widget.mode == ConsentMode.update ? 'Updated terms' : 'Your consent',
         actions: [
           if (widget.mode == ConsentMode.update)
             TextButton(onPressed: () => context.read<AuthState>().logout(), child: const Text('Log out')),
@@ -96,7 +98,7 @@ class _ConsentScreenState extends State<ConsentScreen> {
       body: _error != null
           ? ErrorView(message: _error!, onRetry: _load)
           : doc == null
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: Sparkle(size: 56, animate: true))
               : ListView(
                   padding: const EdgeInsets.all(20),
                   children: [

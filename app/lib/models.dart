@@ -1,6 +1,14 @@
 /// Data from the Lumis API. The shapes match backend/app/schemas.py.
 library;
 
+/// "Fungal skin infection (tinea or ringworm)" → ("Fungal skin infection", "Tinea or ringworm").
+(String, String?) splitConditionName(String name) {
+  final m = RegExp(r'^(.*?)\s*\((.+)\)\s*$').firstMatch(name);
+  if (m == null) return (name, null);
+  final other = m.group(2)!;
+  return (m.group(1)!, other[0].toUpperCase() + other.substring(1));
+}
+
 DateTime _date(Object? v) => DateTime.parse(v as String).toLocal();
 String? _str(Object? v) => v as String?;
 
@@ -151,6 +159,10 @@ class Screening {
   final String modelVersion;
   final Explanation? explanation;
 
+  /// "Fungal skin infection (tinea or ringworm)" → ("Fungal skin infection", "Tinea or ringworm"), so the
+  /// result can show the plain name large and the other names under it.
+  (String, String?) get nameParts => splitConditionName(conditionName ?? 'Inconclusive');
+
   factory Screening.fromJson(Map<String, dynamic> j) {
     final condition = j['condition'] as Map<String, dynamic>?;
     final details = j['symptom_details'] as Map<String, dynamic>?;
@@ -291,6 +303,44 @@ class ClinicList {
       checked: d['checked'] as String,
       attribution: d['attribution'] as String,
       outsideCoverage: (j['outside_coverage'] as bool?) ?? false,
+    );
+  }
+}
+
+/// One test of the model on held-out photos, as stored with the model (backend models/*.json).
+class TestResult {
+  TestResult({required this.n, required this.accuracy, this.accuracyHigh, this.accuracyLow});
+  final int n;
+  final double accuracy;
+  final double? accuracyHigh; // how often "High confidence" results were right
+  final double? accuracyLow; // how often "Low confidence" (moderate band) results were right
+
+  static TestResult? tryParse(Object? j) {
+    if (j is! Map<String, dynamic> || j['n'] is! num || j['accuracy'] is! num) return null;
+    return TestResult(
+      n: (j['n'] as num).toInt(),
+      accuracy: (j['accuracy'] as num).toDouble(),
+      accuracyHigh: (j['accuracy_high'] as num?)?.toDouble(),
+      accuracyLow: (j['accuracy_moderate'] as num?)?.toDouble(),
+    );
+  }
+}
+
+class ModelInfo {
+  ModelInfo({required this.modelVersion, required this.classes, this.phoneTest, this.clinicalTest});
+  final String modelVersion;
+  final List<String> classes;
+  final TestResult? phoneTest; // SCIN: photos people took themselves
+  final TestResult? clinicalTest; // DermNet: clinical photos
+
+  factory ModelInfo.fromJson(Map<String, dynamic> j) {
+    final t = j['test_results'];
+    final tests = t is Map<String, dynamic> ? t : const <String, dynamic>{};
+    return ModelInfo(
+      modelVersion: j['model_version'] as String,
+      classes: [for (final c in (j['classes'] as List? ?? const [])) c as String],
+      phoneTest: TestResult.tryParse(tests['scin_test']),
+      clinicalTest: TestResult.tryParse(tests['dermnet_test']),
     );
   }
 }

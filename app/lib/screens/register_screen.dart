@@ -70,7 +70,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create your account')),
+      appBar: lumisAppBar(context, title: 'Create your account'),
       body: Form(
         key: _form,
         child: ListView(

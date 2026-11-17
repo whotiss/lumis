@@ -2,18 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'api.dart';
+import 'app_settings.dart';
 import 'auth_state.dart';
 import 'screens/consent_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/welcome_screen.dart';
+import 'sparkle.dart';
 import 'theme.dart';
 import 'widgets.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   final api = Api();
   runApp(MultiProvider(
     providers: [
       Provider<Api>.value(value: api),
+      ChangeNotifierProvider(create: (_) => AppSettings()..load()),
       ChangeNotifierProvider(create: (_) => AuthState(api)..start()),
     ],
     child: const LumisApp(),
@@ -25,10 +29,13 @@ class LumisApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settings = context.watch<AppSettings>();
     return MaterialApp(
       title: 'Lumis',
       debugShowCheckedModeBanner: false,
-      theme: lumisTheme(),
+      theme: lumisTheme(Brightness.light),
+      darkTheme: lumisTheme(Brightness.dark),
+      themeMode: settings.themeMode,
       home: const AuthGate(),
     );
   }
@@ -42,7 +49,7 @@ class AuthGate extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthState>();
     return switch (auth.status) {
-      AuthStatus.starting => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      AuthStatus.starting => const Scaffold(body: Center(child: Sparkle(size: 72, animate: true))),
       AuthStatus.loggedOut => const WelcomeScreen(),
       AuthStatus.needsConsent => const ConsentScreen(mode: ConsentMode.update),
       AuthStatus.ready => const HomeScreen(),

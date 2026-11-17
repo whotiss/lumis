@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '../models.dart';
+import '../theme.dart';
+import '../widgets.dart';
 import 'processing_screen.dart';
 
 /// Three optional questions (FR2). Skippable: they are saved with the result for you or a doctor to see,
@@ -25,47 +27,50 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
         (r) => r.isFirst, // back from the result goes home, not to the camera
       );
 
-  Widget _yesNo(String question, bool? value, ValueChanged<bool?> onChanged) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(question, style: Theme.of(context).textTheme.titleMedium),
-      const SizedBox(height: 8),
-      Wrap(spacing: 8, children: [
-        for (final (label, v) in [('Yes', true), ('No', false), ('Not sure', null)])
-          ChoiceChip(label: Text(label), selected: value == v, onSelected: (_) => onChanged(v)),
+  Widget _choices<T>(String question, List<(String, T)> options, T? value, ValueChanged<T?> onChanged) {
+    return Panel(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(question, style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 12),
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          for (final (label, v) in options)
+            ChoiceChip(
+              label: Text(label),
+              selected: value == v && value != null,
+              onSelected: (on) => onChanged(on ? v : null),
+            ),
+        ]),
       ]),
-      const SizedBox(height: 20),
-    ]);
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final p = context.palette;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('A few questions'),
-        actions: [TextButton(onPressed: () => _go(const SymptomDetails()), child: const Text('Skip'))],
-      ),
+      appBar: lumisAppBar(context, title: 'A few questions', actions: [
+        TextButton(onPressed: () => _go(const SymptomDetails()), child: const Text('Skip')),
+      ]),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
         children: [
-          const Text('Optional. Your answers are saved with the result, so you or a doctor can see them later.'),
-          const SizedBox(height: 24),
-          Text('How long have you had it?', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Wrap(spacing: 8, runSpacing: 8, children: [
-            for (final e in SymptomDetails.durationLabels.entries)
-              ChoiceChip(
-                label: Text(e.value),
-                selected: _duration == e.key,
-                onSelected: (on) => setState(() => _duration = on ? e.key : null),
-              ),
-          ]),
-          const SizedBox(height: 20),
-          _yesNo('Is it itchy?', _itchy, (v) => setState(() => _itchy = v)),
-          _yesNo('Has it changed or spread recently?', _changing, (v) => setState(() => _changing = v)),
-          const SizedBox(height: 8),
-          FilledButton(
+          Text('Optional. Your answers are saved with the result, so you or a doctor can see them later. '
+              'They do not change what Lumis says about the photo.',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300, height: 1.5, color: p.muted)),
+          const SizedBox(height: 18),
+          _choices<String>('How long have you had it?',
+              [for (final e in SymptomDetails.durationLabels.entries) (e.value, e.key)], _duration,
+              (v) => setState(() => _duration = v)),
+          const SizedBox(height: 10),
+          _choices<bool>('Is it itchy?', const [('Yes', true), ('No', false)], _itchy,
+              (v) => setState(() => _itchy = v)),
+          const SizedBox(height: 10),
+          _choices<bool>('Has it changed or spread recently?', const [('Yes', true), ('No', false)], _changing,
+              (v) => setState(() => _changing = v)),
+          const SizedBox(height: 22),
+          LumisButton(
+            label: 'Check my photo',
             onPressed: () => _go(SymptomDetails(duration: _duration, itchy: _itchy, changing: _changing)),
-            child: const Text('Check my photo'),
           ),
         ],
       ),

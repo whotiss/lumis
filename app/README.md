@@ -60,14 +60,37 @@ Then commit and push. `patch_ios.py` adds the messages iOS shows when the app as
 | Consent (English / Bahasa Malaysia, versioned, required boxes start unticked) | `screens/consent_screen.dart` | NFR4 |
 | Register, log in | `screens/register_screen.dart`, `login_screen.dart` | FR11 |
 | Home (one main action) | `screens/home_screen.dart` | |
-| Capture (camera with a square framing guide, gallery) | `screens/capture_screen.dart` | FR1 |
+| Capture (camera with a square framing guide, live light and steadiness check, gallery) | `screens/capture_screen.dart`, `photo_check.dart` | FR1 |
 | Optional questions (skippable) | `screens/questions_screen.dart` | FR2 |
-| Processing (and the photo-check message) | `screens/processing_screen.dart` | NFR1 |
-| Result (band, explanation, screening-aid statement) | `screens/result_screen.dart` | FR3, FR4, FR5, FR9 |
-| Find a dermatologist (by distance, or A to Z) | `screens/clinics_screen.dart` | FR6 |
+| Analyzing (progress ring, steps; and the photo-check message) | `screens/processing_screen.dart` | NFR1 |
+| Result (confidence scale, explanation, screening-aid statement, share with a doctor as PDF) | `screens/result_screen.dart`, `report_pdf.dart` | FR3, FR4, FR5, FR9 |
+| Find a dermatologist (map, filters, call / directions / website, lower-cost option) | `screens/clinics_screen.dart` | FR6 |
 | History (review, delete) | `screens/history_screen.dart` | FR7, FR10 |
 | About the conditions | `screens/conditions_screen.dart` | FR8 |
-| Settings (consents, log out, delete account) | `screens/settings_screen.dart` | FR10, NFR4 |
+| Settings (light / dark / match phone, consents, log out, delete account) | `screens/settings_screen.dart` | FR10, NFR4 |
+
+## Look and feel ("follow the light", redesign 2026-11-18)
+
+- **Colors:** cream, paper and indigo in light mode; night blue and lavender in dark mode (`theme.dart`,
+  `LumisPalette`). Settings has Light / Dark / Match phone; the moon/sun button on Home switches directly. The camera
+  is always dark.
+- **Type:** Jost Light for headings and the LUMIS wordmark, Inter for reading text, bundled in `assets/fonts`
+  (SIL Open Font License, Latin only; Chinese text will use the phone's own font).
+- **The star** (`sparkle.dart`): a four-point star with a star-shaped glow that slowly brightens and dims. It also shows
+  confidence: bright and glowing for High, faint for Low, an outline for Inconclusive. The animation stops when the
+  phone asks for reduced motion.
+- **Confidence scale:** Inconclusive / Low / High. There is no "Moderate" step: on 2026-11-15 the moderate band was
+  labeled "Low confidence" because those results were right only 31% of the time on phone photos.
+- **Analyzing screen:** "Photo received" is real progress (bytes sent). After that the server reports no progress, so
+  the ring moves on a timer based on the usual 4 to 5 seconds and only closes when the result arrives.
+- **Live camera check:** light (too dark / too bright) and movement, measured on the centre square of the preview a few
+  times a second. Focus is not checked live, because smooth skin has little texture and would often be called
+  blurry. The thresholds in `photo_check.dart` are first guesses to tune on real phones. It warns; it never blocks.
+- **Share with a doctor:** a one-page A4 PDF (photo, result, the person's answers, Claude's description, how reliable
+  the model was in testing from `GET /model`, and "not a diagnosis, not clinically validated"). Made on the phone and
+  shared with the phone's share sheet; nothing is uploaded.
+- **Map:** OpenStreetMap tiles through `flutter_map`, with the attribution OpenStreetMap requires. Directions open
+  Apple Maps on iPhone and Google Maps on Android.
 
 ## Design decisions
 
@@ -79,8 +102,8 @@ Then commit and push. `patch_ios.py` adds the messages iOS shows when the app as
   on mobile data. Gallery photos are sent whole (scaled to 1280 px).
 - **Location:** asked for only on the clinic screen, only if the person agreed to it, and sent in the request body
   (never stored or logged by the server). Without it the list is A to Z.
-- **Confidence:** a three-step band with a label, never a percentage. No red or green, so a result never looks like a
-  verdict.
+- **Confidence:** a three-step star scale with the server's sentence, never a percentage. No red or green, so a result
+  never looks like a verdict.
 - **Questions before a screening:** optional and skippable. They are saved with the result; they do not change it, and
   the app says so.
 - **Offline or server asleep:** every screen that loads data has a retry. The processing screen explains that the

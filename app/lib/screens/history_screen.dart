@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../api.dart';
 import '../models.dart';
+import '../sparkle.dart';
+import '../theme.dart';
 import '../widgets.dart';
 import 'result_screen.dart';
 
@@ -48,17 +50,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     final items = _items;
     return Scaffold(
-      appBar: AppBar(title: const Text('Your screenings')),
+      appBar: lumisAppBar(context, title: 'History'),
       body: _error != null
           ? ErrorView(message: _error!, onRetry: _load)
           : items == null
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: Sparkle(size: 56, animate: true))
               : items.isEmpty
-                  ? const ErrorView(message: 'No screenings yet. Your results will appear here.', icon: Icons.history)
+                  ? const ErrorView(message: 'No screenings yet. Your results will appear here.')
                   : RefreshIndicator(
                       onRefresh: _load,
                       child: ListView.separated(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.fromLTRB(20, 6, 20, 28),
                         itemCount: items.length,
                         separatorBuilder: (context, i) => const SizedBox(height: 10),
                         itemBuilder: (context, i) => _HistoryTile(
@@ -84,22 +86,26 @@ class _HistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: scheme.outlineVariant)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: CircleAvatar(
-          backgroundColor: BandIndicator.colorFor(s.band).withValues(alpha: 0.15),
-          child: Icon(s.imageAvailable ? Icons.photo_outlined : Icons.description_outlined,
-              color: BandIndicator.colorFor(s.band)),
+    final p = context.palette;
+    return Panel(
+      padding: const EdgeInsets.all(16),
+      onTap: onOpen,
+      child: Row(children: [
+        Sparkle(size: 30, style: sparkleFor(s.band)),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(s.nameParts.$1, style: Theme.of(context).textTheme.titleMedium),
+            Text('${DateFormat('d MMM yyyy').format(s.createdAt)} · ${s.bandLabel}',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w300, color: p.muted)),
+          ]),
         ),
-        title: Text(s.conditionName ?? 'Inconclusive'),
-        subtitle: Text('${DateFormat('d MMM yyyy').format(s.createdAt)} · ${s.bandLabel}'),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onOpen,
-      ),
+        if (s.imageAvailable) ...[
+          Icon(Icons.photo_outlined, size: 18, color: p.starOutline),
+          const SizedBox(width: 6),
+        ],
+        Icon(Icons.chevron_right_rounded, color: p.starOutline),
+      ]),
     );
   }
 }

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../api.dart';
 import '../models.dart';
+import '../sparkle.dart';
+import '../theme.dart';
 import '../widgets.dart';
 
 /// Reference information on the five conditions Lumis screens for (FR8).
@@ -41,24 +43,30 @@ class _ConditionsScreenState extends State<ConditionsScreen> {
   Widget build(BuildContext context) {
     final items = _items;
     return Scaffold(
-      appBar: AppBar(title: const Text('About the conditions')),
+      appBar: lumisAppBar(context, title: 'About the conditions'),
       body: _error != null
           ? ErrorView(message: _error!, onRetry: _load)
           : items == null
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: Sparkle(size: 56, animate: true))
               : ListView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(20, 6, 20, 28),
                   children: [
                     for (final c in items) ...[
-                      InfoCard(
-                        child: ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(c.name),
-                          subtitle: Text(c.category),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () => Navigator.push(
-                              context, MaterialPageRoute(builder: (_) => ConditionDetailScreen(condition: c))),
-                        ),
+                      Panel(
+                        padding: const EdgeInsets.all(16),
+                        onTap: () => Navigator.push(
+                            context, MaterialPageRoute(builder: (_) => ConditionDetailScreen(condition: c))),
+                        child: Row(children: [
+                          Expanded(
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(c.name, style: Theme.of(context).textTheme.titleMedium),
+                              Text(c.category,
+                                  style: TextStyle(
+                                      fontSize: 13, fontWeight: FontWeight.w300, color: context.palette.muted)),
+                            ]),
+                          ),
+                          Icon(Icons.chevron_right_rounded, color: context.palette.starOutline),
+                        ]),
                       ),
                       const SizedBox(height: 10),
                     ],
@@ -81,7 +89,7 @@ class ConditionDetailScreen extends StatelessWidget {
     final c = condition;
     const gap = SizedBox(height: 14);
     return Scaffold(
-      appBar: AppBar(title: Text(c.name)),
+      appBar: lumisAppBar(context, title: c.name),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
