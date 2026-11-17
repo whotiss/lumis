@@ -1,0 +1,33 @@
+# Codemagic builds the iOS app on a cloud Mac (there is no Mac here). Start it by hand in the Codemagic web app.
+#
+# ios-unsigned: an .ipa without Apple code signing, for installing on your own iPhone with Sideloadly (free Apple ID;
+# the installed app expires after 7 days, so reinstall it the day before a demo). See app/README.md, "iPhone".
+workflows:
+  ios-unsigned:
+    name: iOS for sideloading (unsigned .ipa)
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+    working_directory: app
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Get Flutter packages
+        script: flutter pub get
+      - name: Check the iOS settings are in place
+        script: |
+          grep -q NSCameraUsageDescription ios/Runner/Info.plist || { echo "Run python tool/patch_ios.py and commit"; exit 1; }
+      - name: Install CocoaPods dependencies
+        script: cd ios && pod install
+      - name: Build without code signing
+        script: flutter build ios --release --no-codesign
+      - name: Package as .ipa
+        script: |
+          rm -rf Payload && mkdir Payload
+          cp -R build/ios/iphoneos/Runner.app Payload/
+          zip -qry lumis-unsigned.ipa Payload
+          ls -la lumis-unsigned.ipa
+    artifacts:
+      - "**/lumis-unsigned.ipa"
+      - /tmp/xcodebuild_logs/*.log

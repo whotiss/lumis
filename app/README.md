@@ -29,6 +29,29 @@ The app talks to the live server on Cloud Run. For a backend on this computer:
 
 Release build for testers: `flutter build apk --release` (the file is `build/app/outputs/flutter-apk/app-release.apk`).
 
+## iPhone (no Mac needed)
+
+The iOS app is built on a cloud Mac by **Codemagic** and installed from Windows with **Sideloadly**, using a normal
+Apple ID. An app installed this way **stops opening after 7 days**: reinstall it the day before a demo. (With the paid
+Apple Developer Program, US$99 a year, a TestFlight build lasts 90 days instead.)
+
+Once, in the `app` folder:
+
+```powershell
+flutter create --platforms ios .
+python tool/patch_ios.py
+```
+
+Then commit and push. `patch_ios.py` adds the messages iOS shows when the app asks for the camera, photos or location
+(without them iOS closes the app) and the name "Lumis".
+
+1. **Build:** sign in at codemagic.io with GitHub, add the `lumis` repository, choose `codemagic.yaml`, start the
+   workflow **iOS for sideloading**. After about 10 to 15 minutes download `lumis-unsigned.ipa` from the build page.
+2. **iPhone, once:** Settings, Privacy & Security, Developer Mode on (the phone restarts).
+3. **Install:** Sideloadly on Windows (it needs Apple's iTunes and iCloud from apple.com, not the Microsoft Store
+   versions). Connect the iPhone by cable, drop the `.ipa` in, enter your Apple ID, Start.
+4. **iPhone, first launch:** Settings, General, VPN & Device Management, trust your Apple ID.
+
 ## Screens (CP1 section 3.4.2)
 
 | Screen | File | Requirement |
