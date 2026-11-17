@@ -114,8 +114,12 @@ gcloud builds submit --config cloudbuild.yaml --substitutions "_MODEL_BUCKET=$MO
 One long line. `--max-instances 2` caps how much can ever run at once, which also caps the cost.
 
 ```powershell
-gcloud run deploy lumis-api --image $IMAGE --region $REGION --service-account $SA --allow-unauthenticated --cpu 8 --memory 4Gi --cpu-boost --execution-environment gen2 --concurrency 4 --min-instances 0 --max-instances 2 --timeout 120 --set-env-vars "IMAGE_BUCKET=$UPLOADS,CONTACT_EMAIL=$CONTACT" --set-secrets "DATABASE_URL=lumis-database-url:latest,JWT_SECRET=lumis-jwt-secret:latest,ANTHROPIC_API_KEY=lumis-anthropic-key:latest"
+gcloud run deploy lumis-api --image $IMAGE --region $REGION --service-account $SA --allow-unauthenticated --cpu 8 --memory 4Gi --cpu-boost --execution-environment gen2 --concurrency 4 --min-instances 0 --max-instances 2 --timeout 120 --set-env-vars "IMAGE_BUCKET=$UPLOADS,CONTACT_EMAIL=$CONTACT,ONNX_THREADS=7" --set-secrets "DATABASE_URL=lumis-database-url:latest,JWT_SECRET=lumis-jwt-secret:latest,ANTHROPIC_API_KEY=lumis-anthropic-key:latest"
 ```
+
+`ONNX_THREADS=7` leaves one of the 8 CPUs free for the rest of the request (Claude's call runs at the same time as
+the model). Measured 2026-11-17: model 3.9 s with 7 threads against 4.6 to 5.7 s with all 8 on the instances
+before it (build plan). `--set-env-vars` replaces every variable, so keep it in this command.
 
 `--allow-unauthenticated` only means the address is reachable from the internet, which the app needs. Every
 screening still requires a Lumis account.
