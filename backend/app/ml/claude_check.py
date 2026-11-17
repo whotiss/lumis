@@ -3,10 +3,10 @@
 Claude (vision) gets the photo, never the person's details, and answers four structured questions:
   1. skin_visible: is skin clearly visible?             no -> "No skin detected." (the skin gate)
   2. photo_quality / photo_problem                      recorded only
-  3. seen: one or two sentences describing what the skin looks like, without naming any condition
+  3. seen_1, seen_2: two short sentences describing what the skin looks like, without naming any condition
   4. fit: for each of the five conditions, whether the visible features are "typical", "partly" typical or
      "not_typical" of it
-The app shows `seen` and the fit for the condition LUMIS chose, nothing else (app/wording.py, explanation()).
+The app shows the description and the fit for the condition LUMIS chose, nothing else (app/wording.py, explanation()).
 
 Rules (declared 2026-11-17, before building; build plan, Phase 5):
   - Claude explains Lumis's result and never overrides it. The condition and band come only from the model.
@@ -36,7 +36,10 @@ import numpy as np
 from PIL import Image
 
 DEFAULT_MODEL = "claude-haiku-5-5"
-PROMPT_VERSION = "explain-v1"
+PROMPT_VERSION = "explain-v2"
+# v1 -> v2 (2026-11-17, after 25 runs on Cloud Run): v1 asked for "one or two sentences" in one field; 10 of 25
+# answers had three sentences and were filtered. v2 asks for exactly two sentences in two separate fields, so the
+# shape of the answer enforces the limit. The filter itself is unchanged.
 MAX_EDGE = 1024              # about 1,300 image tokens; plenty to judge a skin photo
 FITS = ("typical", "partly", "not_typical")
 
@@ -47,7 +50,7 @@ SYSTEM = ("You look at skin photos for Lumis, a skin-condition screening aid use
 PROMPT = """Look at this photo.
 1. skin_visible: is human skin clearly visible and the main subject of the photo?
 2. photo_quality: "good" if the skin area is in focus, close enough and lit well enough to judge its appearance; otherwise "poor", and give the main photo_problem.
-3. seen: in one or two short sentences, describe what the skin in the photo looks like: color, shape, size, texture, edges and pattern, and the body area if you can tell. Start with "In your photo,". Describe only what is visible. Do not name or suggest any condition, disease, infection or cause, and do not give advice. If no skin is visible, give an empty string.
+3. seen_1 and seen_2: describe what the skin in the photo looks like in exactly two short sentences, one sentence in each field, each 20 words or fewer: color, shape, size, texture, edges and pattern, and the body area if you can tell. seen_1 starts with "In your photo,". Describe only what is visible. Do not name or suggest any condition, disease, infection or cause, and do not give advice. If no skin is visible, give empty strings.
 4. fit: for each condition below, how well do the visible features match its usual appearance? Answer "typical", "partly" or "not_typical".
 {conditions}"""
 
@@ -60,11 +63,12 @@ def build_schema(classes: list[str]) -> dict:
             "photo_quality": {"type": "string", "enum": ["good", "poor"]},
             "photo_problem": {"type": "string",
                               "enum": ["none", "blurry", "too_dark", "too_far", "obstructed", "not_skin", "other"]},
-            "seen": {"type": "string"},
+            "seen_1": {"type": "string"},
+            "seen_2": {"type": "string"},
             "fit": {"type": "object", "properties": {c: {"type": "string", "enum": list(FITS)} for c in classes},
                     "required": list(classes), "additionalProperties": False},
         },
-        "required": ["skin_visible", "photo_quality", "photo_problem", "seen", "fit"],
+        "required": ["skin_visible", "photo_quality", "photo_problem", "seen_1", "seen_2", "fit"],
         "additionalProperties": False,
     }
 
@@ -169,10 +173,12 @@ def parse_response(response, classes: list[str], model: str) -> ClaudeVerdict:
         if any(v not in FITS for v in fit.values()):
             raise ValueError("unknown fit value")
         skin = bool(d["skin_visible"])
-        seen, why = check_seen(str(d.get("seen", ""))) if skin else (None, "no skin")
+        parts = [p for p in (str(d.get("seen_1", "")).strip(), str(d.get("seen_2", "")).strip()) if p]
+        raw = " ".join(p if p[-1] in ".!?" else p + "." for p in parts)
+        seen, why = check_seen(raw) if skin else (None, "no skin")
         return ClaudeVerdict(ok=True, skin_visible=skin, photo_quality=str(d["photo_quality"]).lower(),
                              photo_problem=str(d["photo_problem"]).lower(), seen=seen,
-                             seen_raw=str(d.get("seen", "")), filtered=why if skin else None, fit=fit, model=model)
+                             seen_raw=raw, filtered=why if skin else None, fit=fit, model=model)
     except (TypeError, ValueError, KeyError) as exc:
         stop = getattr(response, "stop_reason", None)
         return ClaudeVerdict(ok=False, error=f"unreadable output ({stop}): {type(exc).__name__}", model=model)

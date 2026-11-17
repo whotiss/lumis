@@ -47,8 +47,8 @@ class FakeClient:
         return fake_response(self.payload)
 
 
-def answer(skin=True, seen=SEEN, eczema="typical", quality="good"):
-    return {"skin_visible": skin, "photo_quality": quality, "photo_problem": "none", "seen": seen,
+def answer(skin=True, seen=SEEN, eczema="typical", quality="good", seen_2=""):
+    return {"skin_visible": skin, "photo_quality": quality, "photo_problem": "none", "seen_1": seen, "seen_2": seen_2,
             "fit": {c: (eczema if c == "eczema" else "not_typical") for c in CLASSES}}
 
 
@@ -63,6 +63,7 @@ def test_request_lists_all_conditions_and_hides_the_model_pick():
     assert [text.index(f"{c}:") for c in CLASSES] == sorted(text.index(f"{c}:") for c in CLASSES)
     schema = r["extra_body"]["output_config"]["format"]["schema"]
     assert schema["properties"]["fit"]["required"] == CLASSES
+    assert {"seen_1", "seen_2"} <= set(schema["required"])
     assert r["thinking"] == {"type": "disabled"}
     # the skin question is word for word the version validated in notebook 15
     assert "1. skin_visible: is human skin clearly visible and the main subject of the photo?" in text
@@ -78,6 +79,15 @@ def test_parse_keeps_a_good_description():
 def test_parse_bad_output_skips(payload, error):
     v = parse_response(fake_response(payload, "max_tokens" if error == "max_tokens" else "end_turn"), CLASSES, "m")
     assert not v.ok and error in v.error
+
+
+def test_two_fields_make_two_sentences():
+    v = parse_response(fake_response(answer(seen="In your photo, a red ring on the arm",
+                                            seen_2="The edge is raised and dry")), CLASSES, "m")
+    assert v.seen == "In your photo, a red ring on the arm. The edge is raised and dry."
+    one = parse_response(fake_response(answer(seen="In your photo, a red ring. It is dry.",
+                                              seen_2="The edge is raised.")), CLASSES, "m")
+    assert one.seen is None and one.filtered == "too many sentences"    # the filter still applies
 
 
 def test_parse_refusal_and_unknown_fit():
