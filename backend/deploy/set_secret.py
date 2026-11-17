@@ -46,6 +46,22 @@ def read_env_value(path: str, key: str) -> str:
     sys.exit(f"{key} was not found in {path}.")
 
 
+def check_value(name: str, value: str) -> str | None:
+    """Catch the usual paste mistakes (two keys, a label or quotes copied with it) before they reach the server."""
+    if any(c.isspace() for c in value):
+        return "the value contains a space or line break inside it. Paste only the key itself, once."
+    if not value.isascii():
+        return "the value contains unusual characters. Copy it again from its source."
+    if "anthropic" in name:
+        if not value.startswith("sk-ant-"):
+            return "an Anthropic API key starts with sk-ant-. Copy the key itself, without a label or quotes."
+        if value.count("sk-ant-") > 1:
+            return "the value contains more than one key. Paste a single key."
+        if not 60 <= len(value) <= 160:
+            return f"an Anthropic API key is about 100 characters long; this is {len(value)}. Copy it again."
+    return None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("name", help="secret name, for example lumis-database-url")
@@ -64,6 +80,10 @@ def main() -> int:
             sys.exit("Nothing was entered, so nothing was saved.")
         if any(c in value for c in "\r\n"):
             sys.exit("The value contains a line break. Paste it as a single line.")
+
+    problem = check_value(args.name, value)
+    if problem:
+        sys.exit(f"Nothing was saved: {problem}")
 
     if gcloud("secrets", "describe", args.name).returncode != 0:
         r = gcloud("secrets", "create", args.name, "--replication-policy", "automatic")
