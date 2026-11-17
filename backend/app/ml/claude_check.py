@@ -36,10 +36,12 @@ import numpy as np
 from PIL import Image
 
 DEFAULT_MODEL = "claude-haiku-5-5"
-PROMPT_VERSION = "explain-v2"
+PROMPT_VERSION = "explain-v2.1"
 # v1 -> v2 (2026-11-17, after 25 runs on Cloud Run): v1 asked for "one or two sentences" in one field; 10 of 25
 # answers had three sentences and were filtered. v2 asks for exactly two sentences in two separate fields, so the
 # shape of the answer enforces the limit. The filter itself is unchanged.
+# v2 -> v2.1 (same day, 5 more runs): 3 of 5 answers still had an extra sentence inside a field. The prompt is the
+# same; the app now shows the first sentence of each field. Every word Claude wrote is still checked for blocked words.
 MAX_EDGE = 1024              # about 1,300 image tokens; plenty to judge a skin photo
 FITS = ("typical", "partly", "not_typical")
 
@@ -88,6 +90,10 @@ MAX_SEEN_SENTENCES = 2
 _blocked = re.compile(r"\b(" + "|".join(BLOCKED_WORDS) + r")", re.IGNORECASE)
 
 
+def _sentences(text: str) -> list[str]:
+    return [p for p in re.split(r"(?<=[.!?])\s+", text.strip()) if p] or [""]
+
+
 def check_seen(text: str) -> tuple[str | None, str | None]:
     """Claude's description -> (text to show, None) or (None, reason it is not shown)."""
     text = " ".join((text or "").split())
@@ -95,7 +101,7 @@ def check_seen(text: str) -> tuple[str | None, str | None]:
         return None, "empty"
     if len(text.split()) > MAX_SEEN_WORDS:
         return None, "too long"
-    if len([s for s in re.split(r"(?<=[.!?])\s+", text) if s]) > MAX_SEEN_SENTENCES:
+    if len(_sentences(text)) > MAX_SEEN_SENTENCES:
         return None, "too many sentences"
     hit = _blocked.search(text)
     if hit:
@@ -175,7 +181,17 @@ def parse_response(response, classes: list[str], model: str) -> ClaudeVerdict:
         skin = bool(d["skin_visible"])
         parts = [p for p in (str(d.get("seen_1", "")).strip(), str(d.get("seen_2", "")).strip()) if p]
         raw = " ".join(p if p[-1] in ".!?" else p + "." for p in parts)
-        seen, why = check_seen(raw) if skin else (None, "no skin")
+        # v2.1: only the first sentence of each field is shown (Claude sometimes writes two per field). The
+        # blocked-word check still covers everything Claude wrote, so trimming can never let a diagnosis through.
+        firsts = [_sentences(p)[0] for p in parts]
+        shown = " ".join(p if p[-1] in ".!?" else p + "." for p in firsts)
+        hit = _blocked.search(raw)
+        if not skin:
+            seen, why = None, "no skin"
+        elif hit:
+            seen, why = None, f"blocked word: {hit.group(1).lower()}"
+        else:
+            seen, why = check_seen(shown)
         return ClaudeVerdict(ok=True, skin_visible=skin, photo_quality=str(d["photo_quality"]).lower(),
                              photo_problem=str(d["photo_problem"]).lower(), seen=seen,
                              seen_raw=raw, filtered=why if skin else None, fit=fit, model=model)

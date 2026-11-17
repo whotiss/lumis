@@ -85,9 +85,13 @@ def test_two_fields_make_two_sentences():
     v = parse_response(fake_response(answer(seen="In your photo, a red ring on the arm",
                                             seen_2="The edge is raised and dry")), CLASSES, "m")
     assert v.seen == "In your photo, a red ring on the arm. The edge is raised and dry."
-    one = parse_response(fake_response(answer(seen="In your photo, a red ring. It is dry.",
-                                              seen_2="The edge is raised.")), CLASSES, "m")
-    assert one.seen is None and one.filtered == "too many sentences"    # the filter still applies
+    extra = parse_response(fake_response(answer(seen="In your photo, a red ring. It is dry.",
+                                                seen_2="The edge is raised. Hairs are visible.")), CLASSES, "m")
+    assert extra.seen == "In your photo, a red ring. The edge is raised."   # first sentence of each field
+    assert extra.seen_raw.count(".") == 4                                    # the log keeps all of it
+    hidden = parse_response(fake_response(answer(seen="In your photo, a red ring. It looks like ringworm.")),
+                            CLASSES, "m")
+    assert hidden.seen is None and "ringworm" in hidden.filtered             # blocked words checked everywhere
 
 
 def test_parse_refusal_and_unknown_fit():
