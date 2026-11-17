@@ -165,3 +165,34 @@ def test_skin_gate_only_mode(tmp_path):
     with TestClient(create_app(settings, predictor=fake, claude_checker=gate)) as client:
         r = screen(client, signup(client, "b@lumis.app"))
         assert r.status_code == 422 and r.json()["detail"]["code"] == "no_skin"
+
+
+def test_claude_outcome_is_reported(make_env, caplog):
+    """A skipped check (wrong key, outage) must be visible in the timing header and the logs."""
+    import logging
+
+    class Failing:
+        class messages:
+            @staticmethod
+            def create(**kw):
+                raise PermissionError("bad key")
+
+    client, _ = make_env(Failing())
+    with client:
+        h = {"Authorization": f"Bearer {client.post('/auth/register', json={'email': 'k@example.com', 'password': 'correct horse'}).json()['access_token']}"}
+        with caplog.at_level(logging.WARNING, logger="lumis.screenings"):
+            r = client.post("/screenings", headers=h, files={"image": ("p.jpg", photo(), "image/jpeg")})
+    assert r.status_code == 201
+    assert 'claude;dur=' in r.headers["server-timing"] and 'desc="skipped (api error: PermissionError)"' in r.headers["server-timing"]
+    assert "Claude check skipped (api error: PermissionError)" in caplog.text
+
+
+def test_smoke_test_flags_a_skipped_claude_check():
+    from scripts.smoke_test import check_claude
+    failures = []
+    check_claude(True, 'preprocess;dur=1, claude;dur=812.0;desc="ok"', failures)
+    assert failures == []
+    check_claude(True, 'model;dur=3, claude;dur=300.2;desc="skipped (api error: AuthenticationError)"', failures)
+    assert "did not run" in failures[0]
+    check_claude(False, "model;dur=3", failures)
+    assert len(failures) == 1

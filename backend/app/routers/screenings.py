@@ -1,4 +1,7 @@
 """Screenings: submit a photo (FR1, FR3, FR4, FR9), history (FR7), delete (FR10)."""
+import logging
+import time
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -13,6 +16,7 @@ from ..storage import ImageStorage
 from ..wording import BAND_LABELS, DISCLAIMER, PHOTO_CHECK_TEXT, result_text
 
 router = APIRouter(prefix="/screenings", tags=["screenings"])
+log = logging.getLogger("lumis.screenings")
 
 
 def to_out(s: Screening) -> ScreeningOut:
@@ -79,7 +83,16 @@ def create_screening(
     if claude is not None:
         top2 = sorted(prediction.probabilities, key=prediction.probabilities.get, reverse=True)[:2]
         names = {c.id: c.name for c in db.scalars(select(Condition).where(Condition.id.in_(top2)))}
+        started = time.perf_counter()
         verdict = claude.check(decode_image(data), top2, names)
+        claude_ms = round((time.perf_counter() - started) * 1000, 1)
+        # Whether the check ran is visible in the logs and the timing header; a skipped check is not an error for
+        # the user (the result is shown without it), so without this a wrong key or an outage would go unnoticed.
+        outcome = "ok" if verdict.ok else f"skipped ({verdict.error})"
+        (log.info if verdict.ok else log.warning)("Claude check %s in %.0f ms", outcome, claude_ms)
+        timing_header = {"Server-Timing": ", ".join(filter(None, [timing_header.get("Server-Timing"),
+                                                                 f'claude;dur={claude_ms};desc="{outcome}"']))}
+        response.headers.update(timing_header)
         check_status, band = apply_verdict(prediction.band, prediction.condition, verdict,
                                           skin_gate=claude.skin_gate, full=claude.full)
         if check_status != "ok":

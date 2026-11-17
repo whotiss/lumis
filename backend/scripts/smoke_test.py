@@ -31,6 +31,20 @@ def step(name, started, extra=""):
     print(f"  ok  {name:<34} {time.perf_counter() - started:6.2f} s  {extra}")
 
 
+def check_claude(claude_on: bool, timing: str, failures: list) -> None:
+    """When the Claude check is switched on, the screening must show that it actually ran."""
+    if not claude_on:
+        return
+    part = next((p for p in timing.split(",") if p.strip().startswith("claude;")), None)
+    if part is None:
+        failures.append("the Claude check is on, but the server did not report it (older server version?)")
+    elif 'desc="ok"' in part:
+        print("      Claude check ran")
+    else:
+        failures.append(f"the Claude check is on but did not run: {part.strip()} "
+                        "(check the lumis-anthropic-key secret)")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("url", help="base URL of the backend, for example https://lumis-api-xxxx.a.run.app")
@@ -53,6 +67,7 @@ def main() -> int:
 
             t = time.perf_counter()
             info = c.get("/model").json()
+            claude_on = bool(info["bands"].get("claude_check"))
             step("model info", t, f"bands {info['bands']}")
 
             t = time.perf_counter()
@@ -73,6 +88,7 @@ def main() -> int:
                 s = r.json()
                 step("screening", t, f"{s['band_label']}: {s['headline']}")
                 print(f"      server timing: {timing}")
+                check_claude(claude_on, timing, failures)
 
                 t = time.perf_counter()
                 history = c.get("/screenings", headers=headers).json()
