@@ -3,8 +3,8 @@
     python scripts/smoke_test.py https://YOUR-SERVICE-URL --photo path/to/a_skin_photo.jpg
     python scripts/smoke_test.py http://127.0.0.1:8000 --photo path/to/a_skin_photo.jpg
 
-What it does: health check, model info, registers a temporary account, sends the photo for a screening,
-reads the history, downloads the stored photo and compares it, deletes the screening, then deletes the
+What it does: health check, model info, consent text, clinic directory, registers a temporary account,
+sends the photo for a screening, reads the history, downloads the stored photo and compares it, deletes the screening, then deletes the
 temporary account. Nothing is left behind on the server. It prints how long each step took.
 
 The photo is sent to your own server (and, if the Claude check is on, to Anthropic for the skin check),
@@ -75,6 +75,13 @@ def main() -> int:
             assert c.get("/consent", params={"lang": "ms"}).json()["version"] == consent["version"]
             required = [i["id"] for i in consent["items"] if i["required"]]
             step("consent text (English and Malay)", t, f"version {consent['version']}, required: {', '.join(required)}")
+
+            t = time.perf_counter()
+            listed = c.get("/clinics").json()["clinics"]
+            near = c.post("/clinics/nearby", json={"lat": 3.0672, "lon": 101.6037, "limit": 3}).json()["clinics"]
+            assert len(listed) >= 70 and near, "the clinic directory is empty"
+            step("clinic directory", t, f"{len(listed)} places; nearest to Sunway University: "
+                                        f"{near[0]['name']} ({near[0]['distance_km']} km)")
 
             t = time.perf_counter()
             r = c.post("/auth/register", json={"email": email, "password": password, "consent_storage": True,

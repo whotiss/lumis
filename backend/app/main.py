@@ -10,10 +10,11 @@ from sqlalchemy.orm import sessionmaker
 
 from .config import Settings, get_settings
 from .db import Base, add_missing_columns, make_engine
+from .clinics import Directory
 from .ml.claude_check import ClaudeCheckConfig, ClaudeChecker
 from .ml.predictor import LumisPredictor
 from .models import Condition
-from .routers import auth, info, screenings
+from .routers import auth, clinics, info, screenings
 from .storage import make_storage
 
 CONDITIONS_FILE = Path(__file__).parent / "data" / "conditions.json"
@@ -44,6 +45,7 @@ def create_app(settings: Settings | None = None, predictor=None, claude_checker=
         app.state.settings = settings
         app.state.session_factory = sessionmaker(engine, expire_on_commit=False)
         seed_conditions(app.state.session_factory)
+        app.state.clinics = Directory.load()          # checked here, so a bad edit stops the start
         app.state.predictor = predictor or LumisPredictor.from_dir(
             settings.model_dir, settings.model_config_file, settings.photo_check_file, threads=settings.onnx_threads)
         app.state.storage = make_storage(settings)
@@ -56,10 +58,10 @@ def create_app(settings: Settings | None = None, predictor=None, claude_checker=
         if missing:
             raise RuntimeError(f"conditions.json has no entry for model classes: {sorted(missing)}")
         logging.getLogger("lumis").info(
-            "started: %s, model %s, photos in %s, Claude check %s", settings.environment,
+            "started: %s, model %s, photos in %s, Claude check %s, %d clinics", settings.environment,
             app.state.predictor.config.model_version,
             f"bucket {settings.image_bucket}" if settings.image_bucket else "local folder",
-            "on" if app.state.claude_checker else "off")
+            "on" if app.state.claude_checker else "off", len(app.state.clinics.clinics))
         yield
         engine.dispose()
 
@@ -68,6 +70,7 @@ def create_app(settings: Settings | None = None, predictor=None, claude_checker=
     app.include_router(info.router)
     app.include_router(auth.router)
     app.include_router(screenings.router)
+    app.include_router(clinics.router)
     return app
 
 

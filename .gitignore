@@ -8,6 +8,8 @@
 
 # Data and models (these live in Google Drive, never in git)
 data/
+# ...except the backend's reference data (conditions, clinic directory), which the server needs
+!backend/app/data/
 datasets/
 checkpoints/
 saved_model/

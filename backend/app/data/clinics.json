@@ -1,0 +1,1483 @@
+{
+ "version": "2026-11-17",
+ "checked": "2026-11-17",
+ "coverage": "Klang Valley: Kuala Lumpur, Putrajaya and the Selangor districts around them",
+ "inclusion": "A place is listed when at least one dermatologist in the Persatuan Dermatologi Malaysia directory names it as where they practise. Aesthetic clinics without a dermatologist are not listed.",
+ "sources": {
+  "dermatologists": "Persatuan Dermatologi Malaysia, Directory of Dermatologists (dermatology.org.my), read 2026-11-17",
+  "locations": "Map data from OpenStreetMap contributors (ODbL 1.0), looked up with Nominatim on 2026-11-17"
+ },
+ "attribution": "Map data © OpenStreetMap contributors",
+ "excluded": {
+  "Nilai Medical Centre": "in Negeri Sembilan, outside the Klang Valley (listed by dr-Wee-Ai-Leen)",
+  "UiTM Faculty of Medicine, Selayang campus": "academic faculty address, not a patient clinic (dr-tarita-taib)",
+  "Clinic at 11 Jalan 19/29, Petaling Jaya": "no clinic name, and no current source could confirm it is open (dr-tan-seng-giaw)",
+  "Hospital Shah Alam": "no dermatology service found on its own pages (checked 2026-11-17)",
+  "Aesthetic clinics in Sunway, Subang, USJ and Puchong": "run by general or aesthetic doctors, not dermatologists (Erufu Care listings, 2026-11-17)"
+ },
+ "clinics": [
+  {
+   "id": "hkl",
+   "name": "Hospital Kuala Lumpur (Dermatology Department)",
+   "type": "government_hospital",
+   "city": "Kuala Lumpur",
+   "address": "Level 6, Kompleks Pakar & Rawatan Harian, Jalan Pahang, 50586 Kuala Lumpur",
+   "phone": "+60 3-2615 5555",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Specialist clinics at government hospitals usually see patients referred by a doctor: ask a klinik kesihatan or a GP for a referral letter.",
+   "lat": 3.172408,
+   "lon": 101.7000867,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap node/5993583341",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-asmah-johar.php",
+    "https://www.dermatology.org.my/dr-azura-affandi.php",
+    "https://www.dermatology.org.my/dr-Chin-Hui-Wenn.php",
+    "https://www.dermatology.org.my/dr-JasonWongLokChin.php",
+    "https://www.dermatology.org.my/dr-Jassriwati-Kosnin.php",
+    "https://www.dermatology.org.my/dr-MazlihaMashor.php",
+    "https://www.dermatology.org.my/dr-moonyza-akmal.php",
+    "https://www.dermatology.org.my/dr-PriyyaSubramaniam.php",
+    "https://www.dermatology.org.my/dr-suganthi-thevarajah.php",
+    "https://www.dermatology.org.my/dr-suganthy-robinson.php",
+    "https://www.dermatology.org.my/dr-TingYenLoo.php",
+    "https://www.dermatology.org.my/dr-WaheedaDianaAbdulKadir.php"
+   ]
+  },
+  {
+   "id": "hta",
+   "name": "Hospital Tunku Azizah (Women and Children's Hospital, paediatric dermatology)",
+   "type": "government_hospital",
+   "city": "Kuala Lumpur",
+   "address": "Jalan Raja Muda Abdul Aziz, 50300 Kuala Lumpur",
+   "phone": "+60 3-2600 3000",
+   "website": null,
+   "note": "Children only",
+   "children_only": true,
+   "access": "Specialist clinics at government hospitals usually see patients referred by a doctor: ask a klinik kesihatan or a GP for a referral letter.",
+   "lat": 3.1700424,
+   "lon": 101.7017634,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/588282177",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Wee-Ai-Leen.php",
+    "https://www.dermatology.org.my/dr-leong-kin-fon.php",
+    "https://www.dermatology.org.my/dr-sabeera-begum.php"
+   ]
+  },
+  {
+   "id": "h-ampang",
+   "name": "Hospital Ampang (Dermatology Department)",
+   "type": "government_hospital",
+   "city": "Ampang",
+   "address": "Jalan Mewah Utara, Pandan Mewah, 68000 Ampang, Selangor",
+   "phone": "+60 3-4289 6000",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Specialist clinics at government hospitals usually see patients referred by a doctor: ask a klinik kesihatan or a GP for a referral letter.",
+   "lat": 3.12811,
+   "lon": 101.7639498,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/545528725",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Nor Azila-Mohamed-Akil.php",
+    "https://www.dermatology.org.my/dr-dawn-ambrose.php"
+   ]
+  },
+  {
+   "id": "h-selayang",
+   "name": "Hospital Selayang (Dermatology Department)",
+   "type": "government_hospital",
+   "city": "Batu Caves",
+   "address": "Lebuhraya Selayang-Kepong, 68100 Batu Caves, Selangor",
+   "phone": "+60 3-6126 3333",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Specialist clinics at government hospitals usually see patients referred by a doctor: ask a klinik kesihatan or a GP for a referral letter.",
+   "lat": 3.2434232,
+   "lon": 101.6469679,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap relation/17333463",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-benji-teoh.php",
+    "https://www.dermatology.org.my/dr-Elizabeth-Chang-Wei-Hsi.php",
+    "https://www.dermatology.org.my/dr-rohna-ridzwan.php",
+    "https://www.dermatology.org.my/dr-TanSeeLing.php",
+    "https://www.dermatology.org.my/dr-Teeba-Raja.php"
+   ]
+  },
+  {
+   "id": "h-sgbuloh",
+   "name": "Hospital Sungai Buloh (Dermatology)",
+   "type": "government_hospital",
+   "city": "Sungai Buloh",
+   "address": "Jalan Hospital, 47000 Sungai Buloh, Selangor",
+   "phone": "+60 3-6145 4333",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Specialist clinics at government hospitals usually see patients referred by a doctor: ask a klinik kesihatan or a GP for a referral letter.",
+   "lat": 3.2189944,
+   "lon": 101.5853037,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap relation/11273781",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-EChiaQi.php",
+    "https://www.dermatology.org.my/dr-kanimoli-rathakrishnan.php"
+   ]
+  },
+  {
+   "id": "h-serdang",
+   "name": "Hospital Sultan Idris Shah Serdang (Dermatology Unit)",
+   "type": "government_hospital",
+   "city": "Kajang",
+   "address": "Jalan Puchong, 43000 Kajang, Selangor",
+   "phone": "+60 3-8947 5555",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Specialist clinics at government hospitals usually see patients referred by a doctor: ask a klinik kesihatan or a GP for a referral letter.",
+   "lat": 2.9768538,
+   "lon": 101.7207653,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1079722928",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-lee-sut-enn.php",
+    "https://www.dermatology.org.my/dr-Low Dyoi-E.php",
+    "https://www.dermatology.org.my/dr-norli-marwyne.php",
+    "https://www.dermatology.org.my/dr-Satnam-Singh-Sachdev.php",
+    "https://www.dermatology.org.my/dr-Tan-Yi-Jun.php"
+   ]
+  },
+  {
+   "id": "htar",
+   "name": "Hospital Tengku Ampuan Rahimah Klang (Dermatology Department)",
+   "type": "government_hospital",
+   "city": "Klang",
+   "address": "Jalan Langat, 41200 Klang, Selangor",
+   "phone": "+60 3-3375 7000",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Specialist clinics at government hospitals usually see patients referred by a doctor: ask a klinik kesihatan or a GP for a referral letter.",
+   "lat": 3.0210892,
+   "lon": 101.4394637,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/276156964",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-ng-ting-guan.php",
+    "https://www.dermatology.org.my/dr-Lalitha-Pillay.php",
+    "https://www.dermatology.org.my/dr-MohdFirdausBinZakaria.php",
+    "https://www.dermatology.org.my/dr-ng-fei-ying.php",
+    "https://www.dermatology.org.my/dr-Nurul-Iman-Binti-Pison.php"
+   ]
+  },
+  {
+   "id": "h-putrajaya",
+   "name": "Hospital Putrajaya (Dermatology Department)",
+   "type": "government_hospital",
+   "city": "Putrajaya",
+   "address": "Presint 7, 62250 Putrajaya",
+   "phone": "+60 3-8312 4200",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Specialist clinics at government hospitals usually see patients referred by a doctor: ask a klinik kesihatan or a GP for a referral letter.",
+   "lat": 2.9293938,
+   "lon": 101.6743234,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/424862122",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Lai-Shiau-Wei.php",
+    "https://www.dermatology.org.my/dr-nazatul-shima.php",
+    "https://www.dermatology.org.my/dr-LimAiWei.php"
+   ]
+  },
+  {
+   "id": "ummc",
+   "name": "University Malaya Medical Centre (Dermatology Unit)",
+   "type": "university_hospital",
+   "city": "Kuala Lumpur",
+   "address": "Jalan Profesor Diraja Ungku Aziz, Lembah Pantai, 59100 Kuala Lumpur",
+   "phone": "+60 3-7949 4422",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Usually needs a referral letter from a doctor; the hospital's private specialist centre may take appointments directly.",
+   "lat": 3.1126872,
+   "lon": 101.6541474,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap relation/13327861",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-tan-leng-leng.php",
+    "https://www.dermatology.org.my/dr-Yong-Shin-Shen.php",
+    "https://www.dermatology.org.my/dr-Nik-Aimee-Azizah-Binti-Faheem.php",
+    "https://www.dermatology.org.my/dr-wong-su-ming.php"
+   ]
+  },
+  {
+   "id": "umsc",
+   "name": "University Malaya Specialist Centre",
+   "type": "university_hospital",
+   "city": "Kuala Lumpur",
+   "address": "Lot 28, Lorong Universiti, Lembah Pantai, 50603 Kuala Lumpur",
+   "phone": "+60 3-7841 4000",
+   "website": "https://www.umsc.my",
+   "note": null,
+   "children_only": false,
+   "access": "Usually needs a referral letter from a doctor; the hospital's private specialist centre may take appointments directly.",
+   "lat": 3.1165846,
+   "lon": 101.6509731,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/995983164",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-tan-leng-leng.php",
+    "https://www.dermatology.org.my/dr-Yong-Shin-Shen.php",
+    "https://www.dermatology.org.my/dr-Nik-Aimee-Azizah-Binti-Faheem.php"
+   ]
+  },
+  {
+   "id": "hctm",
+   "name": "Hospital Canselor Tuanku Muhriz UKM (Dermatology)",
+   "type": "university_hospital",
+   "city": "Cheras",
+   "address": "Jalan Yaacob Latif, Bandar Tun Razak, 56000 Kuala Lumpur",
+   "phone": "+60 3-9145 5555",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Usually needs a referral letter from a doctor; the hospital's private specialist centre may take appointments directly.",
+   "lat": 3.0982349,
+   "lon": 101.7256995,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/149160360",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-adawiyah.php",
+    "https://www.dermatology.org.my/dr-norazirah-md-nor.php"
+   ]
+  },
+  {
+   "id": "hpupm",
+   "name": "Hospital Sultan Abdul Aziz Shah, UPM (formerly Hospital Pengajar UPM)",
+   "type": "university_hospital",
+   "city": "Serdang",
+   "address": "Persiaran MARDI-UPM, 43400 Serdang, Selangor",
+   "phone": null,
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Usually needs a referral letter from a doctor; the hospital's private specialist centre may take appointments directly.",
+   "lat": 2.9800853,
+   "lon": 101.7179603,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1079722932",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-HOW-KANG-NIEN.php"
+   ]
+  },
+  {
+   "id": "uitm-sgbuloh",
+   "name": "UiTM Medical Specialist Centre, Sungai Buloh (Dermatology)",
+   "type": "university_hospital",
+   "city": "Sungai Buloh",
+   "address": "Jalan Hospital, 47000 Sungai Buloh, Selangor",
+   "phone": "+60 3-6126 5000",
+   "website": "https://uitmmsc.uitm.edu.my/index.php/dermatology",
+   "note": null,
+   "children_only": false,
+   "access": "Usually needs a referral letter from a doctor; the hospital's private specialist centre may take appointments directly.",
+   "lat": 3.222421,
+   "lon": 101.5934327,
+   "location_precision": "area",
+   "location_source": "OpenStreetMap way/324480915",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Meera-Kuppusamy.php",
+    "https://www.dermatology.org.my/dr-nurashikin-ahmad.php",
+    "https://www.dermatology.org.my/dr-rokiah-ismail.php"
+   ]
+  },
+  {
+   "id": "hasa-uitm",
+   "name": "Hospital Al-Sultan Abdullah UiTM",
+   "type": "university_hospital",
+   "city": "Bandar Puncak Alam",
+   "address": "Jalan Ibrahim, 42300 Bandar Puncak Alam, Selangor",
+   "phone": "+60 3-3396 3000",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Usually needs a referral letter from a doctor; the hospital's private specialist centre may take appointments directly.",
+   "lat": 3.2096393,
+   "lon": 101.4509521,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1079102020",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Liyana-Dhamirah-Aminuddin.php",
+    "https://www.dermatology.org.my/dr-Sabrina-binti-Ab-Wahab.php"
+   ]
+  },
+  {
+   "id": "sunway-mc",
+   "name": "Sunway Medical Centre",
+   "type": "private_hospital",
+   "city": "Bandar Sunway",
+   "address": "5, Jalan Lagoon Selatan, Bandar Sunway, 47500 Subang Jaya, Selangor",
+   "phone": "+60 3-7491 9191",
+   "website": "https://www.sunwaymedical.com/en/speciality/dermatology",
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0661113,
+   "lon": 101.6085546,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap (Nominatim)",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-heah-sheau-szu.php",
+    "https://www.dermatology.org.my/dr-sharifah-rosniza.php",
+    "https://www.dermatology.org.my/dr-bong-jan-ling.php",
+    "https://www.dermatology.org.my/dr-felix-yap.php",
+    "https://www.dermatology.org.my/dr-lee-yin-yin.php"
+   ]
+  },
+  {
+   "id": "sjmc",
+   "name": "Subang Jaya Medical Centre",
+   "type": "private_hospital",
+   "city": "Subang Jaya",
+   "address": "1, Jalan SS 12/1A, 47500 Subang Jaya, Selangor",
+   "phone": "+60 3-5639 1212",
+   "website": "https://subangjayamedicalcentre.com/our-specialties/dermatology",
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0790791,
+   "lon": 101.5936654,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/154636427",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-chng-chin-chwen.php",
+    "https://www.dermatology.org.my/dr-Jenny-Tan-Yen-Ling.php",
+    "https://www.dermatology.org.my/dr-kwan-zhenli.php",
+    "https://www.dermatology.org.my/dr-loh-liew-cheng.php",
+    "https://www.dermatology.org.my/dr-yap-yen-piow.php"
+   ]
+  },
+  {
+   "id": "ca-puchong",
+   "name": "Columbia Asia Hospital Puchong",
+   "type": "private_hospital",
+   "city": "Puchong",
+   "address": "Lebuh Puteri, Bandar Puteri, 47100 Puchong, Selangor",
+   "phone": "+60 3-8064 8688",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0240782,
+   "lon": 101.6225105,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/202979852",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-kanimoli-rathakrishnan.php",
+    "https://www.dermatology.org.my/dr-tee-shwu-hoon.php"
+   ]
+  },
+  {
+   "id": "assunta",
+   "name": "Assunta Hospital",
+   "type": "private_hospital",
+   "city": "Petaling Jaya",
+   "address": "Jalan Templer, PJS 4, 46990 Petaling Jaya, Selangor",
+   "phone": "+60 3-7872 3000",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.093455,
+   "lon": 101.6452651,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap relation/17060995",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Ee-Siew-Li.php",
+    "https://www.dermatology.org.my/dr-chu-sik-fai.php"
+   ]
+  },
+  {
+   "id": "ca-pj",
+   "name": "Columbia Asia Hospital Petaling Jaya",
+   "type": "private_hospital",
+   "city": "Petaling Jaya",
+   "address": "Lot 69, Jalan 13/6, Seksyen 13, 46200 Petaling Jaya, Selangor",
+   "phone": "+60 3-7949 9999",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1180471,
+   "lon": 101.6378698,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap relation/17805089",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-azura-affandi.php"
+   ]
+  },
+  {
+   "id": "admc",
+   "name": "Ara Damansara Medical Centre",
+   "type": "private_hospital",
+   "city": "Shah Alam",
+   "address": "Lot 2, Jalan Lapangan Terbang Subang, Seksyen U2, 40150 Shah Alam, Selangor",
+   "phone": "+60 3-5639 1212",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1146633,
+   "lon": 101.5649901,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1251234894",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-azura-affandi.php",
+    "https://www.dermatology.org.my/dr-Liyana-Dhamirah-Aminuddin.php"
+   ]
+  },
+  {
+   "id": "gleneagles-kl",
+   "name": "Gleneagles Hospital Kuala Lumpur (dermatologists' clinics, Medical Office Building)",
+   "type": "private_hospital",
+   "city": "Kuala Lumpur",
+   "address": "282 & 286 Jalan Ampang, 50450 Kuala Lumpur",
+   "phone": "+60 3-4141 3000",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1619033,
+   "lon": 101.7391744,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/914977615",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-chang-choong-chor.php",
+    "https://www.dermatology.org.my/dr-gan-ain-tian.php",
+    "https://www.dermatology.org.my/dr-peter-chng.php"
+   ]
+  },
+  {
+   "id": "prince-court",
+   "name": "Prince Court Medical Centre",
+   "type": "private_hospital",
+   "city": "Kuala Lumpur",
+   "address": "39, Jalan Kia Peng, 50450 Kuala Lumpur",
+   "phone": "+60 3-2160 0000",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1490035,
+   "lon": 101.7213527,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/324185283",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-gangaram.php",
+    "https://www.dermatology.org.my/dr-Shaaira-Nasir.php",
+    "https://www.dermatology.org.my/dr-norashikin-shamsudin.php",
+    "https://www.dermatology.org.my/dr-norazirah-md-nor.php"
+   ]
+  },
+  {
+   "id": "tung-shin",
+   "name": "Tung Shin Hospital",
+   "type": "private_hospital",
+   "city": "Kuala Lumpur",
+   "address": "102, Jalan Pudu, 55100 Kuala Lumpur",
+   "phone": "+60 3-2037 2288",
+   "website": "https://www.tungshin.com.my/our-services/our-medical-specialties/dermatology",
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.14621,
+   "lon": 101.7043227,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/24581947",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Gan-Teck-Sheng.php",
+    "https://www.dermatology.org.my/dr-chu-sik-fai.php",
+    "https://www.dermatology.org.my/dr-HOW-KANG-NIEN.php"
+   ]
+  },
+  {
+   "id": "pantai-kl",
+   "name": "Pantai Hospital Kuala Lumpur",
+   "type": "private_hospital",
+   "city": "Kuala Lumpur",
+   "address": "8, Jalan Bukit Pantai, Bangsar, 59100 Kuala Lumpur",
+   "phone": "+60 3-2282 6558",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.119574,
+   "lon": 101.6666016,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/498082299",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-lim-tou-chai.php",
+    "https://www.dermatology.org.my/dr-steven-chow-kim-weng.php",
+    "https://www.dermatology.org.my/dr-Lalitha-Pillay.php"
+   ]
+  },
+  {
+   "id": "pantai-cheras",
+   "name": "Pantai Hospital Cheras",
+   "type": "private_hospital",
+   "city": "Cheras",
+   "address": "1, Jalan 1/96A, Taman Cheras Makmur, 56100 Kuala Lumpur",
+   "phone": "+60 3-9145 2888",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1026904,
+   "lon": 101.7408736,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/28287738",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-low-peck-gan.php",
+    "https://www.dermatology.org.my/dr-Low Dyoi-E.php"
+   ]
+  },
+  {
+   "id": "pantai-ampang",
+   "name": "Pantai Hospital Ampang",
+   "type": "private_hospital",
+   "city": "Ampang",
+   "address": "Jalan Perubatan 1, Pandan Indah, 55100 Kuala Lumpur",
+   "phone": "+60 3-4289 2810",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1277625,
+   "lon": 101.752238,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/960113115",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Nor Azila-Mohamed-Akil.php",
+    "https://www.dermatology.org.my/dr-benji-teoh.php"
+   ]
+  },
+  {
+   "id": "pantai-klang",
+   "name": "Pantai Hospital Klang",
+   "type": "private_hospital",
+   "city": "Klang",
+   "address": "Lot 5921, Persiaran Raja Muda Musa, 42000 Port Klang, Selangor",
+   "phone": "+60 3-3258 5500",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0263859,
+   "lon": 101.4263106,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap node/4269801295",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-LimAiWei.php"
+   ]
+  },
+  {
+   "id": "sunway-velocity",
+   "name": "Sunway Medical Centre Velocity",
+   "type": "private_hospital",
+   "city": "Kuala Lumpur",
+   "address": "Lingkaran Sunway Velocity, Sunway Velocity, 55100 Kuala Lumpur",
+   "phone": "+60 3-9772 9191",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1281332,
+   "lon": 101.722089,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1230135078",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-irene-lee.php"
+   ]
+  },
+  {
+   "id": "sunway-damansara",
+   "name": "Sunway Specialist Centre Damansara",
+   "type": "private_hospital",
+   "city": "Kota Damansara",
+   "address": "Sunway Nexis Retails, Jalan PJU 5/1, Kota Damansara, 47810 Petaling Jaya, Selangor",
+   "phone": "+60 3-6411 9191",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1502457,
+   "lon": 101.5964122,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1030583398",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-heah-sheau-szu.php",
+    "https://www.dermatology.org.my/dr-Teh-Yeon-Chiat.php"
+   ]
+  },
+  {
+   "id": "thomson-kd",
+   "name": "Thomson Hospital Kota Damansara",
+   "type": "private_hospital",
+   "city": "Kota Damansara",
+   "address": "11, Jalan Teknologi, PJU 5, Kota Damansara, 47810 Petaling Jaya, Selangor",
+   "phone": "+60 3-6287 1111",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1488124,
+   "lon": 101.5785858,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/314969034",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-gangaram.php",
+    "https://www.dermatology.org.my/dr-noor-zalmy-azizan.php"
+   ]
+  },
+  {
+   "id": "kpj-dsh",
+   "name": "KPJ Damansara Specialist Hospital",
+   "type": "private_hospital",
+   "city": "Petaling Jaya",
+   "address": "119, Jalan SS 20/10, Damansara Utama, 47400 Petaling Jaya, Selangor",
+   "phone": "+60 3-7722 2692",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1373862,
+   "lon": 101.62754,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap relation/17132995",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-mardziah-alias.php",
+    "https://www.dermatology.org.my/dr-saadiah-sulaiman.php",
+    "https://www.dermatology.org.my/dr-suraiya-hani-hussein.php",
+    "https://www.dermatology.org.my/dr-Zareen-Aidah-Yahya.php"
+   ]
+  },
+  {
+   "id": "kpj-dsh2",
+   "name": "KPJ Damansara Specialist Hospital 2",
+   "type": "private_hospital",
+   "city": "Kuala Lumpur",
+   "address": "1, Jalan Bukit Lanjan 3, Bukit Lanjan, 60000 Kuala Lumpur",
+   "phone": null,
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1710937,
+   "lon": 101.6184986,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/866532532",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Kwan-Jing-Wern.php"
+   ]
+  },
+  {
+   "id": "kpj-sentosa",
+   "name": "KPJ Sentosa KL Specialist Hospital",
+   "type": "private_hospital",
+   "city": "Kuala Lumpur",
+   "address": "Kompleks Damai, 36 Jalan Cemur, 50400 Kuala Lumpur",
+   "phone": "+60 3-4043 7166",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1707974,
+   "lon": 101.6972916,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1560432691",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-moonyza-akmal.php"
+   ]
+  },
+  {
+   "id": "kpj-ampang",
+   "name": "KPJ Ampang Puteri Specialist Hospital",
+   "type": "private_hospital",
+   "city": "Ampang",
+   "address": "1, Jalan Mamanda 9, Taman Dato' Ahmad Razali, 68000 Ampang, Selangor",
+   "phone": "+60 3-4270 2500",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1599268,
+   "lon": 101.7520216,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/580287765",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-biduwiyah.php",
+    "https://www.dermatology.org.my/dr-mazlin-mohd-baseri.php"
+   ]
+  },
+  {
+   "id": "kpj-kajang",
+   "name": "KPJ Kajang Specialist Hospital",
+   "type": "private_hospital",
+   "city": "Kajang",
+   "address": "Jalan Cheras, Kampung Sungai Kantan, 43000 Kajang, Selangor",
+   "phone": "+60 3-8769 2999",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 2.9998953,
+   "lon": 101.7858949,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/169543765",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-IshvantKaurSidhu.php",
+    "https://www.dermatology.org.my/dr-Satnam-Singh-Sachdev.php"
+   ]
+  },
+  {
+   "id": "kpj-selangor",
+   "name": "KPJ Selangor Specialist Hospital",
+   "type": "private_hospital",
+   "city": "Shah Alam",
+   "address": "Lot 1, Jalan Singa 20/1, Seksyen 20, 40300 Shah Alam, Selangor",
+   "phone": null,
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0574921,
+   "lon": 101.5409949,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/26125041",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Sabrina-binti-Ab-Wahab.php"
+   ]
+  },
+  {
+   "id": "avisena",
+   "name": "Avisena Specialist Hospital (formerly DEMC)",
+   "type": "private_hospital",
+   "city": "Shah Alam",
+   "address": "4, Jalan Ikhtisas, Seksyen 14, 40000 Shah Alam, Selangor",
+   "phone": "+60 3-5515 1888",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0714143,
+   "lon": 101.5236927,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/466428174",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-noraziah-abdul-kadir.php",
+    "https://www.dermatology.org.my/dr-kartini-rahim.php"
+   ]
+  },
+  {
+   "id": "avisena-wc",
+   "name": "Avisena Women's and Children's Specialist Hospital",
+   "type": "private_hospital",
+   "city": "Shah Alam",
+   "address": "Seksyen 14, 40000 Shah Alam, Selangor",
+   "phone": null,
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0716582,
+   "lon": 101.5210324,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/893887822",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-kartini-rahim.php"
+   ]
+  },
+  {
+   "id": "msu-mc",
+   "name": "MSU Medical Centre",
+   "type": "private_hospital",
+   "city": "Shah Alam",
+   "address": "Jalan Boling Padang 13/64, Seksyen 13, 40100 Shah Alam, Selangor",
+   "phone": "+60 3-5526 2600",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0767228,
+   "lon": 101.5527679,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/628482834",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Satnam-Singh-Sachdev.php"
+   ]
+  },
+  {
+   "id": "ca-bukit-rimau",
+   "name": "Columbia Asia Hospital Bukit Rimau",
+   "type": "private_hospital",
+   "city": "Shah Alam",
+   "address": "3, Persiaran Anggerik Eria, Bukit Rimau, Seksyen 32, 40460 Shah Alam, Selangor",
+   "phone": "+60 3-5125 9999",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 2.9971982,
+   "lon": 101.5287721,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1487103893",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-tee-shwu-hoon.php"
+   ]
+  },
+  {
+   "id": "ca-setapak",
+   "name": "Columbia Asia Hospital Setapak",
+   "type": "private_hospital",
+   "city": "Setapak",
+   "address": "1, Jalan Danau Saujana, Taman Danau Kota, 53300 Kuala Lumpur",
+   "phone": "+60 3-4145 9999",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.2013077,
+   "lon": 101.7182374,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/948403756",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Elizabeth-Chang-Wei-Hsi.php",
+    "https://www.dermatology.org.my/dr-Teeba-Raja.php"
+   ]
+  },
+  {
+   "id": "ca-cheras",
+   "name": "Columbia Asia Hospital Cheras",
+   "type": "private_hospital",
+   "city": "Cheras",
+   "address": "Lot 33107, Jalan Suakasih, Bandar Tun Hussein Onn, 43200 Cheras, Selangor",
+   "phone": "+60 3-9086 9999",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0317887,
+   "lon": 101.7628799,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/155291940",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-kartini-rahim.php",
+    "https://www.dermatology.org.my/dr-Teeba-Raja.php"
+   ]
+  },
+  {
+   "id": "ca-bukit-jalil",
+   "name": "Columbia Asia Hospital Bukit Jalil",
+   "type": "private_hospital",
+   "city": "Bukit Jalil",
+   "address": "9, Jalan Jalil Perkasa 7, Bukit Jalil, 57000 Kuala Lumpur",
+   "phone": "+60 3-8657 9888",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0583919,
+   "lon": 101.6876079,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1111716120",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Satnam-Singh-Sachdev.php"
+   ]
+  },
+  {
+   "id": "parkcity",
+   "name": "Parkcity Medical Centre",
+   "type": "private_hospital",
+   "city": "Kuala Lumpur",
+   "address": "2, Jalan Intisari Perdana, Desa ParkCity, 52200 Kuala Lumpur",
+   "phone": "+60 3-6279 3131",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1890565,
+   "lon": 101.6384401,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/310914219",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Teh-Yih-Herng.php",
+    "https://www.dermatology.org.my/dr-benji-teoh.php"
+   ]
+  },
+  {
+   "id": "global-doctors",
+   "name": "Global Doctors Hospital",
+   "type": "private_hospital",
+   "city": "Mont Kiara",
+   "address": "18, Jalan Kiara 3, Mont Kiara, 50480 Kuala Lumpur",
+   "phone": "+60 3-2303 9911",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.1684525,
+   "lon": 101.6487594,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap node/5418179021",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-nazirin-ariffin.php",
+    "https://www.dermatology.org.my/dr-suraiya-hani-hussein.php"
+   ]
+  },
+  {
+   "id": "kmi-taman-desa",
+   "name": "KMI Taman Desa Medical Centre",
+   "type": "private_hospital",
+   "city": "Kuala Lumpur",
+   "address": "45, Jalan Desa, Taman Desa, off Old Klang Road, 58100 Kuala Lumpur",
+   "phone": "+60 3-7982 6500",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0960749,
+   "lon": 101.6778549,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/180134061",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Irshath-Ibrahim.php",
+    "https://www.dermatology.org.my/dr-kader.php"
+   ]
+  },
+  {
+   "id": "manipal-klang",
+   "name": "Manipal Hospital Klang",
+   "type": "private_hospital",
+   "city": "Klang",
+   "address": "168, Jalan Batu Unjur 1, Taman Bayu Perdana, 41200 Klang, Selangor",
+   "phone": "+60 3-3324 3288",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0149413,
+   "lon": 101.4341866,
+   "location_precision": "street",
+   "location_source": "OpenStreetMap way/15176288",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-priya.php"
+   ]
+  },
+  {
+   "id": "sg-long",
+   "name": "Sungai Long Specialist Hospital",
+   "type": "private_hospital",
+   "city": "Kajang",
+   "address": "Lot PT 21147, Persiaran Sungai Long 1, Bandar Sungai Long, 43000 Kajang, Selangor",
+   "phone": "+60 3-9010 3788",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0396483,
+   "lon": 101.7951177,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/323215441",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-lee-sut-enn.php"
+   ]
+  },
+  {
+   "id": "andorra",
+   "name": "Andorra Women and Children Hospital",
+   "type": "private_hospital",
+   "city": "Seri Kembangan",
+   "address": "19, Jalan Utama, Taman Suria Tropika, 43000 Seri Kembangan, Selangor",
+   "phone": "+60 3-8966 1100",
+   "website": "https://www.andorracare.com",
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 2.974408,
+   "lon": 101.6780977,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap node/8308145408",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-norashikin-shamsudin.php"
+   ]
+  },
+  {
+   "id": "bukit-tinggi-mc",
+   "name": "Bukit Tinggi Medical Centre (Skincentric)",
+   "type": "private_hospital",
+   "city": "Klang",
+   "address": "Lot 83211, Persiaran Batu Nilam, Bandar Bukit Tinggi 1, 41200 Klang, Selangor",
+   "phone": "+60 3-5639 1515",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "Call to book an appointment with a dermatologist.",
+   "lat": 3.0101193,
+   "lon": 101.4316994,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/366063159",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-GohSW.php"
+   ]
+  },
+  {
+   "id": "ranjit-ss15",
+   "name": "Klinik Pakar Kulit Ranjit",
+   "type": "specialist_clinic",
+   "city": "Subang Jaya",
+   "address": "C4, Jalan SS 15/4D, 47500 Subang Jaya, Selangor",
+   "phone": "+60 3-5631 6090",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.0764044,
+   "lon": 101.5863822,
+   "location_precision": "street",
+   "location_source": "OpenStreetMap way/607045978",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-ranjit-singh.php"
+   ]
+  },
+  {
+   "id": "chua-puchong",
+   "name": "Chua Skin Specialist",
+   "type": "specialist_clinic",
+   "city": "Puchong",
+   "address": "16-1, Jalan Puteri 1/4, Bandar Puteri, 47100 Puchong, Selangor",
+   "phone": "+60 11-1123 2398",
+   "website": "https://chuaskin.com/",
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.026567,
+   "lon": 101.6166491,
+   "location_precision": "street",
+   "location_source": "OpenStreetMap way/201611975",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-chua.php"
+   ]
+  },
+  {
+   "id": "ay-skin",
+   "name": "AY Skin Specialist & Aesthetic Centre",
+   "type": "specialist_clinic",
+   "city": "Petaling Jaya",
+   "address": "52, Jalan SS 21/1, Damansara Utama, 47400 Petaling Jaya, Selangor",
+   "phone": "+60 3-7710 0023",
+   "website": "http://www.ayskinspecialist.com/",
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1350709,
+   "lon": 101.6208282,
+   "location_precision": "street",
+   "location_source": "OpenStreetMap way/776065960",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-adrian-yong.php"
+   ]
+  },
+  {
+   "id": "koh-wong",
+   "name": "Koh & Wong Skin Specialist Clinic",
+   "type": "specialist_clinic",
+   "city": "Petaling Jaya",
+   "address": "5M, Jalan SS 21/1A, Damansara Utama, 47400 Petaling Jaya, Selangor",
+   "phone": "+60 3-7725 8437",
+   "website": "https://wongskin.com",
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1352545,
+   "lon": 101.6210233,
+   "location_precision": "street",
+   "location_source": "OpenStreetMap way/157188826",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-koh-chuan-keng.php",
+    "https://www.dermatology.org.my/dr-wong-su-ming.php"
+   ]
+  },
+  {
+   "id": "myclinic-uptown",
+   "name": "My Clinic Uptown Damansara (dermatology sessions)",
+   "type": "specialist_clinic",
+   "city": "Petaling Jaya",
+   "address": "8, Jalan SS 21/35, Damansara Utama, 47400 Petaling Jaya, Selangor",
+   "phone": "+60 12-309 9480",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1369111,
+   "lon": 101.6240932,
+   "location_precision": "street",
+   "location_source": "OpenStreetMap way/608818378",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-Liyana-Dhamirah-Aminuddin.php"
+   ]
+  },
+  {
+   "id": "chang-seapark",
+   "name": "Klinik Pakar Kulit Chang",
+   "type": "specialist_clinic",
+   "city": "Petaling Jaya",
+   "address": "153A (1st Floor), Jalan SS 2/24, SEA Park, 47300 Petaling Jaya, Selangor",
+   "phone": "+60 3-7877 0946",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.113599,
+   "lon": 101.620513,
+   "location_precision": "street",
+   "location_source": "OpenStreetMap way/1454054453",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-chang-chee-khong.php"
+   ]
+  },
+  {
+   "id": "chew-jln-ipoh",
+   "name": "Chew Skin Specialist Clinic",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "Suite 201, 2nd Floor, Bangunan UMNO Selangor, 142 Jalan Sultan Azlan Shah (Jalan Ipoh), 51200 Kuala Lumpur",
+   "phone": "+60 3-4042 7492",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.170693,
+   "lon": 101.6934658,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1117064289",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-chew-hon-nam.php"
+   ]
+  },
+  {
+   "id": "pr-jln-ipoh",
+   "name": "Klinik Pakar Perubatan P & R",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "120 Jalan Sultan Azlan Shah (Jalan Ipoh), 51200 Kuala Lumpur",
+   "phone": "+60 3-4045 1521",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1697641,
+   "lon": 101.6947904,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1097192607",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-prasanna.php"
+   ]
+  },
+  {
+   "id": "chu-pudu",
+   "name": "Chu Skin Clinic",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "1st Floor, 70 Jalan Pudu, 55100 Kuala Lumpur",
+   "phone": "+60 3-2070 8216",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1458011,
+   "lon": 101.70258,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1325280106",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-chu-sik-fai.php"
+   ]
+  },
+  {
+   "id": "skin-centre-pudu",
+   "name": "The Skin Centre (Klinik Khas dan Pakar Kulit Chow)",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "323 (Ground Floor), Jalan Pudu, 55100 Kuala Lumpur",
+   "phone": "+60 3-9222 5278",
+   "website": "https://klskincentre.my",
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1353648,
+   "lon": 101.7123784,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap node/4211695589",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-steven-chow-kim-weng.php",
+    "https://www.dermatology.org.my/dr-lim-tou-chai.php"
+   ]
+  },
+  {
+   "id": "gan-medan-tuanku",
+   "name": "Gan Skin Specialist Clinic",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "1st Floor, Wisma Tai Yoon, 9A Lorong Medan Tuanku 1, 50300 Kuala Lumpur",
+   "phone": "+60 3-2692 6314",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.158929,
+   "lon": 101.6971384,
+   "location_precision": "street",
+   "location_source": "OpenStreetMap way/169795932",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-gan-ain-tian.php"
+   ]
+  },
+  {
+   "id": "sachdev-tar",
+   "name": "Sachdev Skin Clinic",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "6th Floor, Emporium Selangor, 71/75 Jalan Tuanku Abdul Rahman, 50100 Kuala Lumpur",
+   "phone": "+60 3-2692 3495",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1525164,
+   "lon": 101.6964738,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1146012548",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-harbajan-singh.php"
+   ]
+  },
+  {
+   "id": "mdnoh-tar",
+   "name": "Klinik Pakar Kulit Md Noh",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "87 (1st Floor), Wisma Mohd Ebrahim, Jalan Tuanku Abdul Rahman, 50100 Kuala Lumpur",
+   "phone": "+60 3-2693 9793",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1528333,
+   "lon": 101.6967433,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1141849705",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-mohd-noh-idris.php"
+   ]
+  },
+  {
+   "id": "kk-kl-rajachulan",
+   "name": "Klinik Kulit Kuala Lumpur",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "Room 601, 6th Floor, Wisma Lim Foo Yong, Jalan Raja Chulan, 50200 Kuala Lumpur",
+   "phone": "+60 3-2142 9522",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1507692,
+   "lon": 101.7092824,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/586483585",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-low-bin-tick.php"
+   ]
+  },
+  {
+   "id": "ting-imbi",
+   "name": "Ting Skin Specialist Clinic",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "136, Jalan Imbi, 55100 Kuala Lumpur",
+   "phone": "+60 3-2144 4848",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.145682,
+   "lon": 101.7147876,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap node/1543756676",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-ting-hoon-chin.php"
+   ]
+  },
+  {
+   "id": "pglow-cheras",
+   "name": "Klinik Pakar Kulit P.G. Low",
+   "type": "specialist_clinic",
+   "city": "Cheras",
+   "address": "11-G, Wisma Low Siew Eng, Jalan 1/92C, Batu 3 1/4 Jalan Cheras, 56000 Kuala Lumpur",
+   "phone": "+60 3-9282 0118",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": null,
+   "lon": null,
+   "location_precision": null,
+   "location_source": null,
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-low-peck-gan.php"
+   ]
+  },
+  {
+   "id": "nazirin-midvalley",
+   "name": "Nazirin Skin Clinic",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "59-1, The Boulevard, Mid Valley City, Lingkaran Syed Putra, 59200 Kuala Lumpur",
+   "phone": "+60 3-2202 2622",
+   "website": "https://www.nazirinskinclinic.com",
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1191723,
+   "lon": 101.6774351,
+   "location_precision": "area",
+   "location_source": "OpenStreetMap node/13302903032",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-nazirin-ariffin.php"
+   ]
+  },
+  {
+   "id": "central-derm-bangsar-south",
+   "name": "Central Dermatology Specialist Clinic",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "Unit 01-08, Level 1, 7 Nexus, Jalan Kerinchi, Bangsar South, 59200 Kuala Lumpur",
+   "phone": "+60 3-9775 1977",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1097245,
+   "lon": 101.6653397,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap node/13088688113",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-noor-zalmy-azizan.php",
+    "https://www.dermatology.org.my/dr-HOW-KANG-NIEN.php"
+   ]
+  },
+  {
+   "id": "ruban-bangsar",
+   "name": "Dr Ruban's Skin & Hair Clinic",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "Unit 2-3A & 2-5, Level 2, Menara UOA Bangsar, 5 Jalan Bangsar Utama 1, 59000 Kuala Lumpur",
+   "phone": "+60 3-2284 0557",
+   "website": "https://www.drruban.com",
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1277608,
+   "lon": 101.6784637,
+   "location_precision": "building",
+   "location_source": "OpenStreetMap way/1474913903",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-ruban.php"
+   ]
+  },
+  {
+   "id": "lptan-ttdi",
+   "name": "Klinik LP Tan Skin Specialist",
+   "type": "specialist_clinic",
+   "city": "Kuala Lumpur",
+   "address": "B-1-3A, TTDI Plaza, Jalan Wan Kadir 3, Taman Tun Dr Ismail, 60000 Kuala Lumpur",
+   "phone": "+60 3-7728 1733",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.1372748,
+   "lon": 101.6310383,
+   "location_precision": "area",
+   "location_source": "OpenStreetMap way/262190434",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-tan-lay-peng.php"
+   ]
+  },
+  {
+   "id": "salleh-ampang",
+   "name": "Klinik Kulit Salleh",
+   "type": "specialist_clinic",
+   "city": "Ampang",
+   "address": "2738B, Jalan Enam, Kemensah Heights, 68000 Ampang, Selangor",
+   "phone": "+60 3-4108 7427",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.2128292,
+   "lon": 101.7623516,
+   "location_precision": "area",
+   "location_source": "OpenStreetMap node/6796287126",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-mohd-salleh.php"
+   ]
+  },
+  {
+   "id": "ko-klang",
+   "name": "Klinik Pakar Kulit Ko",
+   "type": "specialist_clinic",
+   "city": "Klang",
+   "address": "12A, Jalan Temoh, off Jalan Goh Hock Huat, 41400 Klang, Selangor",
+   "phone": "+60 3-3343 3140",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.0510594,
+   "lon": 101.4446052,
+   "location_precision": "street",
+   "location_source": "OpenStreetMap way/167774729",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-ko-chung-beng.php"
+   ]
+  },
+  {
+   "id": "yap-klang",
+   "name": "Klinik Pakar Kulit Yap",
+   "type": "specialist_clinic",
+   "city": "Klang",
+   "address": "17A, Lorong Raja Hassan, 41400 Klang, Selangor",
+   "phone": "+60 3-3342 1350",
+   "website": null,
+   "note": null,
+   "children_only": false,
+   "access": "A dermatologist's own clinic: call to book an appointment.",
+   "lat": 3.0462957,
+   "lon": 101.447961,
+   "location_precision": "street",
+   "location_source": "OpenStreetMap way/612108514",
+   "dermatologist_source": [
+    "https://www.dermatology.org.my/dr-yap-yen-piow.php"
+   ]
+  }
+ ]
+}

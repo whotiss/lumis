@@ -58,5 +58,9 @@ secrets live in Secret Manager. Useful scripts:
 | GET /model, GET /health | Model version and test results; health check | NFR7 |
 | GET /consent?lang=en or ms | Consent text to show before registering (versioned; English and Malay) | NFR4 |
 | POST /me/consent/accept | Agree to a new consent version; screenings are refused until then | NFR4 |
+| GET /clinics | Every dermatology place in the Klang Valley directory, A to Z (filter with `?type=`) | FR6 |
+| POST /clinics/nearby | The nearest places to a location, with straight-line distance; the location is not stored or logged | FR6 |
+
+The clinic directory is `app/data/clinics.json`; how it was made and how to update it is in `docs/clinic_directory.md`.
 
 All result wording lives in `app/wording.py`, so screening-aid positioning (NFR8) is enforced in one place.

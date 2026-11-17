@@ -106,3 +106,58 @@ class ModelInfoOut(BaseModel):
     classes: list[str]
     bands: dict
     test_results: dict | None
+
+
+# ---------------------------------------------------------------- clinic directory (FR6)
+
+ClinicType = Literal["government_hospital", "university_hospital", "private_hospital", "specialist_clinic"]
+
+
+class ClinicOut(BaseModel):
+    id: str
+    name: str
+    type: ClinicType
+    city: str
+    address: str
+    phone: str | None
+    website: str | None
+    note: str | None
+    children_only: bool
+    access: str = Field(description="How to be seen there, e.g. whether a referral letter is usually needed")
+    lat: float | None
+    lon: float | None
+    location_precision: Literal["building", "street", "area"] | None = Field(
+        description="How exact the pin is: the building itself, its street, or its neighbourhood")
+    location_source: str | None
+    dermatologist_source: list[str] = Field(description="Directory pages of dermatologists who practise there")
+    distance_km: float | None = Field(None, description="Straight-line distance, only in nearby results")
+
+
+class DirectoryInfo(BaseModel):
+    version: str
+    checked: str
+    coverage: str
+    inclusion: str
+    sources: dict[str, str]
+    attribution: str = Field(description="Must be shown wherever the map positions are used")
+
+
+class ClinicListOut(BaseModel):
+    directory: DirectoryInfo
+    clinics: list[ClinicOut]
+
+
+class NearbyIn(BaseModel):
+    model_config = ConfigDict(json_schema_extra={"example": {"lat": 3.0672, "lon": 101.6037, "limit": 5}})
+
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+    limit: int = Field(10, ge=1, le=50)
+    types: list[ClinicType] | None = Field(None, description="Only these kinds of place; all kinds if empty")
+
+
+class NearbyOut(BaseModel):
+    directory: DirectoryInfo
+    outside_coverage: bool = Field(description="True when even the nearest place is far away: the list only "
+                                               "covers the Klang Valley")
+    clinics: list[ClinicOut]
